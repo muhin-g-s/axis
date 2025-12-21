@@ -4,14 +4,26 @@ import { Router, Switch } from 'wouter-preact'
 export function App() {
   return (
     <Router>
-       <PrefetchLink routeName={RouteNames.TEST}>
-      <div>Test</div>
-    </PrefetchLink>
-    <Switch>
-      <AsyncRoute path={RouteNames.HOME} />
-      <AsyncRoute path={RouteNames.TEST} />
-    </Switch>
+      <div className="app-container">
+        <header>
+          <nav>
+            <PrefetchLink routeName={RouteNames.HOME}>
+              <button>Home</button>
+            </PrefetchLink>
+            <PrefetchLink routeName={RouteNames.TEST}>
+              <button>Test</button>
+            </PrefetchLink>
+          </nav>
+        </header>
+
+        <main>
+          <Switch>
+            <AsyncRoute path={RouteNames.HOME} />
+            <AsyncRoute path={RouteNames.TEST} />
+            <AsyncRoute path={RouteNames.TODO_DETAIL} />
+          </Switch>
+        </main>
+      </div>
     </Router>
-   
   )
 }
