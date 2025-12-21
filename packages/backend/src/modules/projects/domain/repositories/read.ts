@@ -2,14 +2,7 @@ import type { Project } from '../entities';
 import type { ProjectId } from '../value-objects/id';
 import type { WorkspaceId } from '../value-objects/workspace-id';
 
-export interface ProjectRepository {
+export interface ProjectReadRepository {
   findById(id: ProjectId): Promise<Project | null>;
-
-  findByWorkspace(
-    workspaceId: WorkspaceId
-  ): Promise<Project[]>;
-
-  save(project: Project): Promise<void>;
-
-  delete(id: ProjectId): Promise<void>;
+	findAllByWorkspace(id: WorkspaceId): Promise<Project[]>
 }
