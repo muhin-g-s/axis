@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm';
+import { Result } from '@backend/libs/result';
 import type { DbClient } from '@backend/app/db/connector';
 import { projects } from '@backend/app/db/schema';
 
@@ -6,6 +7,14 @@ import { ProjectSchema, type Project } from '../../domain/entities';
 import type { ProjectId } from '../../domain/value-objects/id';
 import type { WorkspaceId } from '../../domain/value-objects/workspace-id';
 import type { ProjectReadRepository } from '../../domain/repositories/read';
+import {
+	createInvalidObjectInDatabaseError,
+	createProjectNotFoundError,
+	type ProjectDomainError,
+	type InvalidObjectInDatabaseError,
+	createUnexpectedDatabaseError
+} from '../../domain/errors';
+import { validate } from '@backend/libs/validation';
 
 export class DrizzleProjectReadRepository
   implements ProjectReadRepository {
@@ -14,35 +23,56 @@ export class DrizzleProjectReadRepository
     private readonly db: DbClient
   ) {}
 
-  async findById(id: ProjectId): Promise<Project | null> {
-    const result = await this.db
-      .select()
-      .from(projects)
-      .where(eq(projects.id, id))
-      .limit(1);
+  async findById(id: ProjectId): Promise<Result<Project, ProjectDomainError>> {
+    try {
+      const result = await this.db
+        .select()
+        .from(projects)
+        .where(eq(projects.id, id))
+        .limit(1);
 
-		const [project] = result;
+      const [project] = result;
 
-		if (project == undefined) {
-			// TODO: throw error
-			return null;
-		}
+      if (project == undefined) {
+        return Result.err(createProjectNotFoundError(id));
+      }
 
-		// TODO: throw error
-		return ProjectSchema.assert(project);
+      const validatedProject = validate<Project, InvalidObjectInDatabaseError>(
+				ProjectSchema,
+				project,
+				msg => createInvalidObjectInDatabaseError(project, 'ProjectSchema', msg)
+			);
+
+			return validatedProject;
+    } catch (error) {
+      return Result.err(createUnexpectedDatabaseError(error));
+    }
   }
 
   async findAllByWorkspace(
     workspaceId: WorkspaceId
-  ): Promise<Project[]> {
-    const res = await this.db
-      .select()
-      .from(projects)
-      .where(
-        eq(projects.workspaceId, workspaceId)
-      );
+  ): Promise<Result<Project[], ProjectDomainError>> {
+    try {
+      const res = await this.db
+        .select()
+        .from(projects)
+        .where(eq(projects.workspaceId, workspaceId));
 
-		// TODO: throw error
-		return res.map(ProjectSchema.assert);
+			for (const project of res) {
+				const validatedProject = validate<Project, InvalidObjectInDatabaseError>(
+					ProjectSchema,
+					project,
+					msg => createInvalidObjectInDatabaseError(project, 'ProjectSchema', msg)
+				);
+
+				if (!validatedProject.ok) {
+					return Result.err(validatedProject.error);
+				}
+			}
+
+      return Result.ok(res as Project[]);
+    } catch (error) {
+      return Result.err(createUnexpectedDatabaseError(error));
+    }
   }
 }

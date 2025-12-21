@@ -21,6 +21,7 @@
     "@ark/util": "^0.56.0",
     "arktype": "^2.1.29",
     "drizzle-orm": "^0.45.1",
+    "ts-pattern": "^5.9.0",
     "uuid": "^13.0.0"
   }
 }
