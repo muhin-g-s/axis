@@ -10,6 +10,7 @@
   "scripts": {
     "dev:backend": "pnpm --filter @todo/backend dev",
     "build:backend": "pnpm --filter @todo/backend build",
+    "start:backend": "pnpm --filter @todo/backend start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{ts,tsx,json,md}\"",
