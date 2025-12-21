@@ -1,0 +1,18 @@
+import { sqliteTable, text, numeric } from "drizzle-orm/sqlite-core";
+import { v4 as uuidv4 } from 'uuid';
+import { projects } from "./projects";
+import { users } from "./users";
+
+export const issues = sqliteTable("issues", {
+  id: text("id").primaryKey().$defaultFn(uuidv4),
+  projectId: text("project_id")
+    .notNull()
+    .references(() => projects.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: text("status"),
+  priority: text("priority"),
+  estimate: numeric("estimate"),
+  assigneeId: text("assignee_id").references(() => users.id),
+  uniqueIdentifier: text("unique_identifier").notNull().unique(),
+});
