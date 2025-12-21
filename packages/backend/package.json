@@ -1,11 +1,12 @@
 {
-  "name": "backend",
+  "name": "@todo/backend",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsdown",
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js",
+    "start": "node dist/index.mjs",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
@@ -13,6 +14,7 @@
     "@types/uuid": "^11.0.0",
     "better-sqlite3": "^12.5.0",
     "drizzle-kit": "^0.31.8",
+    "tsdown": "^0.18.1",
     "tsx": "^4.21.0"
   },
   "dependencies": {
