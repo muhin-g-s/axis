@@ -1,8 +1,5 @@
 import { type } from 'arktype';
 
-export const EmailSchema = type('string.email').brand('Email');
-export type Email = typeof EmailSchema.infer;
-
 export const PositiveIntSchema = type('number.integer > 0').brand('PositiveInt');
 export type PositiveInt = typeof PositiveIntSchema.infer;
 

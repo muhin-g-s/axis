@@ -5,7 +5,7 @@ import { users } from '@backend/app/db/schema';
 import {
 	createUnexpectedDatabaseError,
 	type IdentityDomainError
-} from '@backend/modules/identity/domain';
+} from '@backend/modules/identity/domain/errors';
 import type { User } from '@backend/modules/identity/domain/entities/user';
 import type { UserWriteRepository } from '@backend/modules/identity/domain/repositories/user-write';
 import type { UserId } from '@backend/modules/identity/domain/value-objects/user-id';

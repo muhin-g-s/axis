@@ -8,6 +8,6 @@ export const WorkspaceIdSchema: IdSchema<Brand> = createIdSchema(brand);
 
 export type WorkspaceId = typeof WorkspaceIdSchema.infer;
 
-export function createWorkspaceIdId(): WorkspaceId {
+export function createWorkspaceId(): WorkspaceId {
   return createId<Brand>();
 }

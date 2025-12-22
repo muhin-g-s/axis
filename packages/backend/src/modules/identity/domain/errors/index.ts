@@ -58,6 +58,22 @@ export interface UnexpectedDatabaseError extends BaseUserError {
 	readonly error: unknown;
 }
 
+export interface WorkspaceUserNotFoundError extends BaseUserError {
+	readonly type: 'WORKSPACE_USER_NOT_FOUND';
+	readonly userId: string;
+	readonly workspaceId: string;
+}
+
+export interface UnexpectedError extends BaseUserError {
+	readonly type: 'UNEXPECTED_ERROR';
+	readonly error: unknown;
+}
+
+export interface UserHasBeenDeletedError extends BaseUserError {
+	readonly type: 'USER_HAS_BEEN_DELETED';
+	readonly email: string;
+}
+
 export type IdentityDomainError =
   | UserNotFoundError
   | InvalidCredentialsError
@@ -68,7 +84,10 @@ export type IdentityDomainError =
 	| InvalidRoleError
 	| InvalidUsernameError
 	| InvalidObjectInDatabaseError
-	| UnexpectedDatabaseError;
+	| UnexpectedDatabaseError
+	| WorkspaceUserNotFoundError
+	| UnexpectedError
+	| UserHasBeenDeletedError;
 
 export const createUserNotFoundError = (
   email?: string
@@ -145,6 +164,25 @@ export const createUnexpectedDatabaseError = (error: unknown): UnexpectedDatabas
 	error,
 });
 
+export const createUnexpectedError = (error: unknown): UnexpectedError => ({
+	type: 'UNEXPECTED_ERROR',
+	message: 'Unexpected error',
+	error,
+});
+
+export const createWorkspaceUserNotFoundError = (userId: string, workspaceId: string): WorkspaceUserNotFoundError => ({
+	type: 'WORKSPACE_USER_NOT_FOUND',
+	message: `User ${userId} not found in workspace ${workspaceId}`,
+	userId,
+	workspaceId,
+});
+
+export const createUserHasBeenDeletedError = (email: string): UserHasBeenDeletedError => ({
+	type: 'USER_HAS_BEEN_DELETED',
+	message: `User with email ${email} has been deleted`,
+	email,
+});
+
 export const isUserNotFoundError = (
   error: IdentityDomainError
 ): error is UserNotFoundError =>
@@ -189,3 +227,15 @@ export const isUnexpectedDatabaseError = (
 	error: IdentityDomainError
 ): error is UnexpectedDatabaseError =>
 	error.type === 'UNEXPECTED_DATABASE_ERROR';
+
+export const isWorkspaceUserNotFoundError = (
+	error: IdentityDomainError
+): error is WorkspaceUserNotFoundError => error.type === 'WORKSPACE_USER_NOT_FOUND';
+
+export const isUnexpectedError = (
+	error: IdentityDomainError
+): error is UnexpectedError => error.type === 'UNEXPECTED_ERROR';
+
+export const isUserHasBeenDeletedError = (
+	error: IdentityDomainError
+): error is UserHasBeenDeletedError => error.type === 'USER_HAS_BEEN_DELETED';

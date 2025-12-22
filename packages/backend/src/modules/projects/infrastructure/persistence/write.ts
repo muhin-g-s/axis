@@ -46,6 +46,7 @@ export class DrizzleProjectWriteRepository
 
   async delete(id: ProjectId): Promise<Result<void, ProjectDomainError>> {
 		try{
+			// TODO: add soft delete
 			await this.db
 				.delete(projects)
 				.where(eq(projects.id, id));
