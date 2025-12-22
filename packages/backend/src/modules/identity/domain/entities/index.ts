@@ -1,1 +1,2 @@
-// Entities exports
+export * from './user';
+export * from './workspace-user';
