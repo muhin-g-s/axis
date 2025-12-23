@@ -6,6 +6,8 @@ This document provides a comprehensive guide for creating new modules in the bac
 - [Module Structure](#module-structure)
 - [Value Objects](#value-objects)
 - [Domain Entities](#domain-entities)
+- [Ports (Cross-Module Interfaces)](#ports-cross-module-interfaces)
+- [Services](#services)
 - [Error Handling](#error-handling)
 - [Repositories](#repositories)
 - [Command and Query Handlers](#command-and-query-handlers)
@@ -26,10 +28,13 @@ modules/
 │   ├── domain/
 │   │   ├── entities/
 │   │   ├── errors/
+│   │   ├── ports/          # Cross-module interfaces
 │   │   ├── repositories/
+│   │   └── services/       # Domain services
 │   │   └── value-objects/
 │   └── infrastructure/
-│       └── persistence/
+│       ├── persistence/
+│       └── services/       # Infrastructure implementations of domain services
 ```
 
 ### Layer Responsibilities:
@@ -74,6 +79,111 @@ export function create[EntityName]Id(): [EntityName]Id {
 - Value objects are validated at creation using arktype schemas
 - They use branded types to prevent mixing values of different types
 - They are immutable and passed by value rather than reference
+
+## Domain Entities
+
+Entities have unique identities and contain business logic.
+
+## Ports (Cross-Module Interfaces)
+
+Ports define interfaces that allow modules to depend on abstractions from other modules without tight coupling.
+
+### Structure Pattern:
+```typescript
+// domain/ports/index.ts
+import type { Result } from "@backend/libs/result";
+import type { UserId } from "../value-objects/user-id";
+import type { [RelatedEntity]Id } from "../value-objects/[related-entity]-id";
+import type { UnexpectedDatabaseError } from "@backend/libs/error";
+
+export interface [RelatedEntity]Checker {
+  is[RelatedEntity](userId: UserId, [relatedEntity]Id: [RelatedEntity]Id): Promise<Result<boolean, UnexpectedDatabaseError>>;
+}
+```
+
+### Key Features:
+- Ports are located in the `domain/ports/` directory
+- They define interfaces that modules can depend on
+- Used to avoid circular dependencies between modules
+- Usually checked by other modules to validate permissions or relationships
+
+## Services
+
+Domain services contain business logic that doesn't belong to a specific entity, such as permission checking or complex business operations that span multiple entities.
+
+### Structure Pattern:
+```typescript
+// domain/services/[service-name].ts
+import type { Result } from "@backend/libs/result";
+import type { UserId } from "../value-objects/user-id";
+import type { [RelatedEntity]Id } from "../value-objects/[related-entity]-id";
+import type { [EntityName]DomainError } from "../errors";
+
+export interface I[EntityName]PermissionChecker {
+  canCreate[EntityName](userId: UserId, [relatedEntity]Id: [RelatedEntity]Id): Promise<Result<void, [EntityName]DomainError>>;
+  canDelete[EntityName](userId: UserId, [relatedEntity]Id: [RelatedEntity]Id): Promise<Result<void, [EntityName]DomainError>>;
+  canModify[EntityName](userId: UserId, [relatedEntity]Id: [RelatedEntity]Id): Promise<Result<void, [EntityName]DomainError>>;
+  canView[EntityName](userId: UserId, [relatedEntity]Id: [RelatedEntity]Id): Promise<Result<void, [EntityName]DomainError>>;
+}
+```
+
+### Infrastructure Implementation:
+```typescript
+// infrastructure/services/[service-name].ts
+import { Result } from "@backend/libs/result";
+import {
+  createCannotAccess[EntityName]Error,
+  createCannotCreate[EntityName]Error,
+  createCannotDelete[EntityName]Error,
+  createCannotModify[EntityName]Error,
+  createCannotView[EntityName]Error,
+  isCannotAccess[EntityName]Error,
+  type [EntityName]DomainError
+} from "../../domain/errors";
+import type { I[EntityName]PermissionChecker } from "../../domain/services/[service-name]";
+import type { UserId } from "../../domain/value-objects/user-id";
+import type { [RelatedEntity]Id } from "../../domain/value-objects/[related-entity]-id";
+import type { [RelatedEntity]Checker } from "@backend/modules/[related-module]/domain/ports";
+
+export class [EntityName]PermissionChecker implements I[EntityName]PermissionChecker {
+  constructor(private readonly [relatedEntity]Checker: [RelatedEntity]Checker) {}
+
+  private async check[RelatedEntity](
+    userId: UserId,
+    [relatedEntity]Id: [RelatedEntity]Id
+  ): Promise<Result<void, [EntityName]DomainError>> {
+    const [relatedEntity]Result = await this.[relatedEntity]Checker.is[RelatedEntity](userId, [relatedEntity]Id);
+
+    if (![relatedEntity]Result.ok) {
+      return [relatedEntity]Result;
+    }
+
+    if (![relatedEntity]Result.value) {
+      return Result.err(createCannotAccess[EntityName]Error(userId));
+    }
+
+    return Result.ok(undefined);
+  }
+
+  async canCreate[EntityName](userId: UserId, [relatedEntity]Id: [RelatedEntity]Id): Promise<Result<void, [EntityName]DomainError>> {
+    return Result
+      .mapErr(
+        await this.check[RelatedEntity](userId, [relatedEntity]Id),
+        err => isCannotAccess[EntityName]Error(err)
+          ? createCannotCreate[EntityName]Error(userId)
+          : err
+      );
+  }
+
+  // Similar implementations for canDelete, canModify, canView
+}
+```
+
+### Key Features:
+- Services are located in `domain/services/` directory
+- Infrastructure implementations are in `infrastructure/services/`
+- Often depend on ports from other modules to check permissions
+- Used for cross-cutting concerns like authorization
 
 ## Domain Entities
 
@@ -170,6 +280,32 @@ interface CannotModifyDeleted[EntityName]Error extends Base[EntityName]Error {
 	readonly [entityName]Id: string;
 }
 
+// Permission-related errors:
+export interface CannotCreate[EntityName]Error extends Base[EntityName]Error {
+	readonly type: 'CANNOT_CREATE_[ENTITY_NAME]';
+	readonly userId: string;
+}
+
+export interface CannotDelete[EntityName]Error extends Base[EntityName]Error {
+	readonly type: 'CANNOT_DELETE_[ENTITY_NAME]';
+	readonly userId: string;
+}
+
+export interface CannotModify[EntityName]Error extends Base[EntityName]Error {
+	readonly type: 'CANNOT_MODIFY_[ENTITY_NAME]';
+	readonly userId: string;
+}
+
+export interface CannotView[EntityName]Error extends Base[EntityName]Error {
+	readonly type: 'CANNOT_VIEW_[ENTITY_NAME]';
+	readonly userId: string;
+}
+
+export interface CannotAccess[EntityName]Error extends Base[EntityName]Error {
+	readonly type: 'CANNOT_ACCESS_[ENTITY_NAME]';
+	readonly userId: string;
+}
+
 export interface InvalidObjectInDatabaseError extends Base[EntityName]Error {
 	readonly type: 'INVALID_OBJECT_IN_DATABASE';
 	readonly object: unknown;
@@ -187,6 +323,11 @@ export type [EntityName]DomainError =
 	| Invalid[EntityName][Property]Error
 	| OptimisticLockError
 	| CannotModifyDeleted[EntityName]Error
+	| CannotCreate[EntityName]Error
+	| CannotDelete[EntityName]Error
+	| CannotModify[EntityName]Error
+	| CannotView[EntityName]Error
+	| CannotAccess[EntityName]Error
 	| InvalidObjectInDatabaseError
 	| UnexpectedDatabaseError;
 ```
@@ -205,6 +346,36 @@ export const createInvalid[EntityName][Property]Error = (invalidValue: string): 
 	invalidValue,
 });
 
+export const createCannotCreate[EntityName]Error = (userId: string): CannotCreate[EntityName]Error => ({
+	type: 'CANNOT_CREATE_[ENTITY_NAME]',
+	message: `User ${userId} cannot create [EntityName]`,
+	userId,
+});
+
+export const createCannotDelete[EntityName]Error = (userId: string): CannotDelete[EntityName]Error => ({
+	type: 'CANNOT_DELETE_[ENTITY_NAME]',
+	message: `User ${userId} cannot delete [EntityName]`,
+	userId,
+});
+
+export const createCannotModify[EntityName]Error = (userId: string): CannotModify[EntityName]Error => ({
+	type: 'CANNOT_MODIFY_[ENTITY_NAME]',
+	message: `User ${userId} cannot modify [EntityName]`,
+	userId,
+});
+
+export const createCannotView[EntityName]Error = (userId: string): CannotView[EntityName]Error => ({
+	type: 'CANNOT_VIEW_[ENTITY_NAME]',
+	message: `User ${userId} cannot view [EntityName]`,
+	userId,
+});
+
+export const createCannotAccess[EntityName]Error = (userId: string): CannotAccess[EntityName]Error => ({
+	type: 'CANNOT_ACCESS_[ENTITY_NAME]',
+	message: `User ${userId} cannot access [EntityName]`,
+	userId,
+});
+
 // Similar creators for other error types
 ```
 
@@ -213,6 +384,26 @@ export const createInvalid[EntityName][Property]Error = (invalidValue: string): 
 export const is[EntityName]NotFoundError = (
 	error: [EntityName]DomainError
 ): error is [EntityName]NotFoundError => error.type === '[ENTITY_NAME]_NOT_FOUND';
+
+export const isCannotCreate[EntityName]Error = (
+	error: [EntityName]DomainError
+): error is CannotCreate[EntityName]Error => error.type === 'CANNOT_CREATE_[ENTITY_NAME]';
+
+export const isCannotDelete[EntityName]Error = (
+	error: [EntityName]DomainError
+): error is CannotDelete[EntityName]Error => error.type === 'CANNOT_DELETE_[ENTITY_NAME]';
+
+export const isCannotModify[EntityName]Error = (
+	error: [EntityName]DomainError
+): error is CannotModify[EntityName]Error => error.type === 'CANNOT_MODIFY_[ENTITY_NAME]';
+
+export const isCannotView[EntityName]Error = (
+	error: [EntityName]DomainError
+): error is CannotView[EntityName]Error => error.type === 'CANNOT_VIEW_[ENTITY_NAME]';
+
+export const isCannotAccess[EntityName]Error = (
+	error: [EntityName]DomainError
+): error is CannotAccess[EntityName]Error => error.type === 'CANNOT_ACCESS_[ENTITY_NAME]';
 
 // Similar guards for other error types
 ```
@@ -285,14 +476,21 @@ import { type [EntityName], create[EntityName] } from "../../domain/entities";
 import type { [EntityName]WriteRepository } from "../../domain/repositories/write";
 import type { Create[EntityName]Command } from "../dto";
 import type { [EntityName]DomainError } from "../../domain/errors";
+import type { I[EntityName]PermissionChecker } from "../../domain/services/[entity-name]-permission-checker";
 
 export class Create[EntityName]Handler {
 	constructor(
 		private readonly writeRepo: [EntityName]WriteRepository,
+		private readonly [entityName]PermissionChecker: I[EntityName]PermissionChecker,
 		private readonly now: () => Timestamp,
 	) {}
 
 	async handle(command: Create[EntityName]Command): Promise<Result<[EntityName], [EntityName]DomainError>> {
+		const canCreate[EntityName]Result = await this.[entityName]PermissionChecker.canCreate[EntityName](command.actorUserId, command.[relatedEntity]Id);
+		if (!canCreate[EntityName]Result.ok) {
+			return canCreate[EntityName]Result;
+		}
+
 		const [entityName] = create[EntityName](
 			command.id,
 			command.property,
@@ -318,11 +516,20 @@ import type { [EntityName] } from "../../domain/entities";
 import type { [EntityName]ReadRepository } from "../../domain/repositories/read";
 import type { Get[EntityName]Query } from "../dto";
 import type { [EntityName]DomainError } from "../../domain/errors";
+import type { I[EntityName]PermissionChecker } from "../../domain/services/[entity-name]-permission-checker";
 
 export class Get[EntityName]Handler {
-	constructor(private readonly readRepo: [EntityName]ReadRepository) {}
+	constructor(
+		private readonly readRepo: [EntityName]ReadRepository,
+		private readonly [entityName]PermissionChecker: I[EntityName]PermissionChecker,
+	) {}
 
 	async handle(query: Get[EntityName]Query): Promise<Result<[EntityName] | null, [EntityName]DomainError>> {
+		const canView[EntityName]Result = await this.[entityName]PermissionChecker.canView[EntityName](query.actorUserId, query.[relatedEntity]Id);
+		if (!canView[EntityName]Result.ok) {
+			return canView[EntityName]Result;
+		}
+
 		return this.readRepo.findById(query.id);
 	}
 }
@@ -339,15 +546,22 @@ import type { Update[EntityName]Command } from "../dto";
 import { update[EntityName] } from "../../domain/entities";
 import { createCannotModifyDeleted[EntityName]Error } from "../../domain/errors";
 import type { [EntityName]DomainError } from "../../domain/errors";
+import type { I[EntityName]PermissionChecker } from "../../domain/services/[entity-name]-permission-checker";
 
 export class Update[EntityName]Handler {
 	constructor(
 		private readonly readRepo: [EntityName]ReadRepository,
 		private readonly uow: UnitOfWork,
+		private readonly [entityName]PermissionChecker: I[EntityName]PermissionChecker,
 		private readonly now: () => Timestamp,
 	) {}
 
 	async handle(command: Update[EntityName]Command): Promise<Result<void, [EntityName]DomainError>> {
+		const canModify[EntityName]Result = await this.[entityName]PermissionChecker.canModify[EntityName](command.actorUserId, command.[relatedEntity]Id);
+		if (!canModify[EntityName]Result.ok) {
+			return canModify[EntityName]Result;
+		}
+
 		const result = await this.uow.run(async (uow) => {
 			const findResult = await this.readRepo.findById(command.id);
 			if (!findResult.ok) {
@@ -380,26 +594,38 @@ export class Update[EntityName]Handler {
 // application/dto/index.ts
 import type { [EntityName]Id } from "../../domain/value-objects/id";
 import type { [EntityName][Property] } from "../../domain/value-objects/[property]";
+import type { UserId } from "../../domain/value-objects/user-id";  // For actor identification
 // Import other related entity IDs if needed
 import type { [RelatedEntity]Id } from "../../domain/value-objects/[related-entity]-id";
 
 export interface Create[EntityName]Command {
-	readonly id: [EntityName]Id,
+	readonly actorUserId: UserId,      // The user performing the action
 	readonly property: [EntityName][Property],
 	readonly [relatedEntity]Id: [RelatedEntity]Id, // if applicable
 }
 
 export interface Update[EntityName]Command {
+	readonly actorUserId: UserId,      // The user performing the action
+	readonly [relatedEntity]Id: [RelatedEntity]Id, // To verify permissions
 	readonly id: [EntityName]Id,
 	readonly newValue: [EntityName][Property],
 }
 
 export interface Delete[EntityName]Command {
+	readonly actorUserId: UserId,      // The user performing the action
+	readonly [relatedEntity]Id: [RelatedEntity]Id, // To verify permissions
 	readonly id: [EntityName]Id,
 }
 
 export interface Get[EntityName]Query {
+	readonly actorUserId: UserId,      // The user performing the action
+	readonly [relatedEntity]Id: [RelatedEntity]Id, // To verify permissions
 	readonly id: [EntityName]Id
+}
+
+export interface Get[EntityNames]By[RelatedEntity]Query {
+	readonly actorUserId: UserId,      // The user performing the action
+	readonly [relatedEntity]Id: [RelatedEntity]Id, // To verify permissions
 }
 
 // Add query interfaces as needed based on use cases
@@ -584,6 +810,7 @@ export class DrizzleUnitOfWork implements UnitOfWork {
 - **result.ts**: Implements Result/Either pattern for error handling
 - **validation.ts**: Wraps arktype validation with Result pattern
 - **version.ts**: Provides version incrementing and comparison utilities for optimistic locking
+- **error.ts**: Provides base error types and error creation utilities
 
 ### Key Usage Patterns:
 - All IDs use branded UUIDs for type safety
@@ -591,6 +818,7 @@ export class DrizzleUnitOfWork implements UnitOfWork {
 - Error handling follows Result pattern with type safety
 - Versioning supports optimistic locking patterns
 - Functional programming approaches for entity updates
+- Actor-based permission checking for security
 
 ## Database Schema Correspondence
 
