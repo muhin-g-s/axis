@@ -6,14 +6,9 @@ import { UserSchema, type User } from '../../domain/entities/user';
 import type { UserId } from '../../domain/value-objects/user-id';
 import type { Email } from '../../domain/value-objects/email';
 import type { UserReadRepository } from '../../domain/repositories/user-read';
-import {
-	createInvalidObjectInDatabaseError,
-  createUnexpectedDatabaseError,
-  createUserNotFoundError,
-  type IdentityDomainError,
-	type InvalidObjectInDatabaseError,
-} from '../../domain/errors';
 import { validate } from '@backend/libs/validation';
+import { createInvalidObjectInDatabaseError, createUnexpectedDatabaseError, type InvalidObjectInDatabaseError } from '@backend/libs/error';
+import { type IdentityDomainError, createUserNotFoundError } from '../../domain/errors';
 
 export class DrizzleUserReadRepository implements UserReadRepository {
   constructor(private readonly db: DbClient) {}

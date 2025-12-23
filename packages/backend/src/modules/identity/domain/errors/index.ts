@@ -1,3 +1,5 @@
+import type { DomainError } from "@backend/libs/error";
+
 interface BaseUserError {
   readonly message: string;
 }
@@ -46,30 +48,13 @@ export interface InvalidUsernameError extends BaseUserError {
 	readonly reason: string;
 }
 
-export interface InvalidObjectInDatabaseError extends BaseUserError {
-	readonly type: 'INVALID_OBJECT_IN_DATABASE';
-	readonly object: unknown;
-	readonly schemaName: string;
-	readonly reason: string;
-}
-
-export interface UnexpectedDatabaseError extends BaseUserError {
-	readonly type: 'UNEXPECTED_DATABASE_ERROR';
-	readonly error: unknown;
-}
-
-export interface UnexpectedError extends BaseUserError {
-	readonly type: 'UNEXPECTED_ERROR';
-	readonly error: unknown;
-}
-
 export interface UserHasBeenDeletedError extends BaseUserError {
 	readonly type: 'USER_HAS_BEEN_DELETED';
 	readonly email: string;
 }
 
-export type IdentityDomainError =
-  | UserNotFoundError
+export type IdentityDomainError = DomainError<
+	| UserNotFoundError
   | InvalidCredentialsError
   | UserAlreadyExistsError
   | WorkspaceUserAlreadyExistsError
@@ -77,10 +62,8 @@ export type IdentityDomainError =
 	| InvalidPasswordError
 	| InvalidRoleError
 	| InvalidUsernameError
-	| InvalidObjectInDatabaseError
-	| UnexpectedDatabaseError
-	| UnexpectedError
-	| UserHasBeenDeletedError;
+	| UserHasBeenDeletedError
+>
 
 export const createUserNotFoundError = (
   email?: string
@@ -143,26 +126,6 @@ export const createInvalidUsernameError = (username: string, reason: string): In
 	reason
 });
 
-export const createInvalidObjectInDatabaseError = (object: unknown, schemaName: string, reason: string): InvalidObjectInDatabaseError => ({
-	type: 'INVALID_OBJECT_IN_DATABASE',
-	message: `Invalid object in database: ${JSON.stringify(object)}, schema: ${schemaName}`,
-	object,
-	schemaName,
-	reason
-});
-
-export const createUnexpectedDatabaseError = (error: unknown): UnexpectedDatabaseError => ({
-	type: 'UNEXPECTED_DATABASE_ERROR',
-	message: 'Unexpected database error',
-	error,
-});
-
-export const createUnexpectedError = (error: unknown): UnexpectedError => ({
-	type: 'UNEXPECTED_ERROR',
-	message: 'Unexpected error',
-	error,
-});
-
 export const createUserHasBeenDeletedError = (email: string): UserHasBeenDeletedError => ({
 	type: 'USER_HAS_BEEN_DELETED',
 	message: `User with email ${email} has been deleted`,
@@ -204,19 +167,6 @@ export const isInvalidRoleError = (
 export const isInvalidUsernameError = (
 	error: IdentityDomainError
 ): error is InvalidUsernameError => error.type === 'INVALID_USERNAME';
-
-export const isInvalidObjectInDatabaseError = (
-	error: IdentityDomainError
-): error is InvalidObjectInDatabaseError => error.type === 'INVALID_OBJECT_IN_DATABASE';
-
-export const isUnexpectedDatabaseError = (
-	error: IdentityDomainError
-): error is UnexpectedDatabaseError =>
-	error.type === 'UNEXPECTED_DATABASE_ERROR';
-
-export const isUnexpectedError = (
-	error: IdentityDomainError
-): error is UnexpectedError => error.type === 'UNEXPECTED_ERROR';
 
 export const isUserHasBeenDeletedError = (
 	error: IdentityDomainError

@@ -1,7 +1,8 @@
 import bcrypt from 'bcrypt';
 import type { PasswordHasher } from '../../domain/port/password-hasher';
 import { Result } from '@backend/libs/result';
-import { createUnexpectedError, type IdentityDomainError } from '../../domain/errors';
+import { type IdentityDomainError } from '../../domain/errors';
+import { createUnexpectedError } from '@backend/libs/error';
 
 export class BcryptPasswordHasher implements PasswordHasher {
   constructor(private readonly saltRounds: number) {}

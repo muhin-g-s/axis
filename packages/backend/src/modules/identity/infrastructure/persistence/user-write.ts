@@ -3,13 +3,13 @@ import { Result } from '@backend/libs/result';
 import type { DbClient } from '@backend/app/db/connector';
 import { users } from '@backend/app/db/schema';
 import {
-	createUnexpectedDatabaseError,
 	type IdentityDomainError
 } from '@backend/modules/identity/domain/errors';
 import type { User } from '@backend/modules/identity/domain/entities/user';
 import type { UserWriteRepository } from '@backend/modules/identity/domain/repositories/user-write';
 import type { UserId } from '@backend/modules/identity/domain/value-objects/user-id';
 import { getUnixTimestampNow } from '@backend/libs/time';
+import { createUnexpectedDatabaseError } from '@backend/libs/error';
 
 export class DrizzleUserWriteRepository implements UserWriteRepository {
   constructor(private readonly db: DbClient) {}
