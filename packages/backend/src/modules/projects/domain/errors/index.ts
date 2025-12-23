@@ -1,42 +1,27 @@
+import type { DomainError } from "@backend/libs/error";
+
 interface BaseProjectError {
   readonly message: string;
 }
 
-interface ProjectNotFoundError extends BaseProjectError {
+export interface ProjectNotFoundError extends BaseProjectError {
   readonly type: 'PROJECT_NOT_FOUND';
   readonly projectId: string;
 }
 
-interface InvalidProjectNameError extends BaseProjectError {
+export interface InvalidProjectNameError extends BaseProjectError {
   readonly type: 'INVALID_PROJECT_NAME';
   readonly invalidName: string;
 }
 
-interface OptimisticLockError extends BaseProjectError {
+export interface OptimisticLockError extends BaseProjectError {
   readonly type: 'OPTIMISTIC_LOCK_ERROR';
   readonly projectId: string;
 }
 
-interface CannotModifyDeletedProjectError extends BaseProjectError {
+export interface CannotModifyDeletedProjectError extends BaseProjectError {
   readonly type: 'CANNOT_MODIFY_DELETED_PROJECT';
   readonly projectId: string;
-}
-
-export interface InvalidObjectInDatabaseError extends BaseProjectError {
-	readonly type: 'INVALID_OBJECT_IN_DATABASE';
-	readonly object: unknown;
-	readonly schemaName: string;
-	readonly reason: string;
-}
-
-export interface UnexpectedDatabaseError extends BaseProjectError {
-	readonly type: 'UNEXPECTED_DATABASE_ERROR';
-	readonly error: unknown;
-}
-
-export interface UnexpectedError extends BaseProjectError {
-	readonly type: 'UNEXPECTED_ERROR';
-	readonly error: unknown;
 }
 
 export interface CannotCreateProjectError extends BaseProjectError {
@@ -64,19 +49,17 @@ export interface CannotAccessProjectError extends BaseProjectError {
 	readonly userId: string;
 }
 
-export type ProjectDomainError =
+export type ProjectDomainError = DomainError<
   | ProjectNotFoundError
   | InvalidProjectNameError
   | OptimisticLockError
   | CannotModifyDeletedProjectError
-	| InvalidObjectInDatabaseError
-	| UnexpectedDatabaseError
-	| UnexpectedError
-	| CannotCreateProjectError
-	| CannotDeleteProjectError
-	| CannotModifyProjectError
-	| CannotViewProjectError
-	| CannotAccessProjectError;
+  | CannotCreateProjectError
+  | CannotDeleteProjectError
+  | CannotModifyProjectError
+  | CannotViewProjectError
+  | CannotAccessProjectError
+>
 
 
 export const createProjectNotFoundError = (projectId: string): ProjectNotFoundError => ({
@@ -103,25 +86,6 @@ export const createCannotModifyDeletedProjectError = (projectId: string): Cannot
   projectId,
 });
 
-export const createInvalidObjectInDatabaseError = (object: unknown, schemaName: string, reason: string): InvalidObjectInDatabaseError => ({
-	type: 'INVALID_OBJECT_IN_DATABASE',
-	message: `Invalid object in database: ${JSON.stringify(object)}, schema: ${schemaName}`,
-	object,
-	schemaName,
-	reason
-});
-
-export const createUnexpectedDatabaseError = (error: unknown): UnexpectedDatabaseError => ({
-	type: 'UNEXPECTED_DATABASE_ERROR',
-	message: `Unexpected database error: ${JSON.stringify(error)}`,
-	error,
-});
-
-export const createUnexpectedError = (error: unknown): UnexpectedError => ({
-	type: 'UNEXPECTED_ERROR',
-	message: `Unexpected error: ${JSON.stringify(error)}`,
-	error,
-});
 
 export const createCannotCreateProjectError = (userId: string): CannotCreateProjectError => ({
 	type: 'CANNOT_CREATE_PROJECT',
@@ -168,18 +132,6 @@ export const isOptimisticLockError = (
 export const isCannotModifyDeletedProjectError = (
   error: ProjectDomainError
 ): error is CannotModifyDeletedProjectError => error.type === 'CANNOT_MODIFY_DELETED_PROJECT';
-
-export const isInvalidObjectInDatabaseError = (
-	error: ProjectDomainError
-): error is InvalidObjectInDatabaseError => error.type === 'INVALID_OBJECT_IN_DATABASE';
-
-export const isUnexpectedDatabaseError = (
-	error: ProjectDomainError
-): error is UnexpectedDatabaseError => error.type === 'UNEXPECTED_DATABASE_ERROR';
-
-export const isUnexpectedError = (
-	error: ProjectDomainError
-): error is UnexpectedError => error.type === 'UNEXPECTED_ERROR';
 
 export const isCannotCreateProjectError = (
 	error: ProjectDomainError

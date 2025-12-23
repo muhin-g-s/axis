@@ -7,7 +7,8 @@ import type { Project } from '../../domain/entities';
 import type { ProjectId } from '../../domain/value-objects/id';
 import type { ProjectWriteRepository } from '../../domain/repositories/write';
 import type { Version } from '@backend/libs/primitives';
-import { createOptimisticLockError, createUnexpectedDatabaseError, type ProjectDomainError } from '../../domain/errors';
+import { createOptimisticLockError, type ProjectDomainError } from '../../domain/errors';
+import { createUnexpectedDatabaseError } from '@backend/libs/error';
 
 export class DrizzleProjectWriteRepository
   implements ProjectWriteRepository {

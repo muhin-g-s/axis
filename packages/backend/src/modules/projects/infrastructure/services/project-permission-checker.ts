@@ -5,7 +5,6 @@ import {
 	createCannotDeleteProjectError,
 	createCannotModifyProjectError,
 	createCannotViewProjectError,
-	createUnexpectedError,
 	isCannotAccessProjectError,
 	type ProjectDomainError
 } from "../../domain/errors";
@@ -24,7 +23,7 @@ export class ProjectPermissionChecker implements IProjectPermissionChecker {
         const isMemberResult = await this.membershipChecker.isMember(userId, workspaceId);
 
         if (!isMemberResult.ok) {
-            return Result.err(createUnexpectedError(isMemberResult.error));
+            return isMemberResult
         }
 
         if (!isMemberResult.value) {

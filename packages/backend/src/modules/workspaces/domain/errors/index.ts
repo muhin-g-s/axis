@@ -1,46 +1,36 @@
+import type { DomainError } from "@backend/libs/error";
+
 interface BaseWorkspaceError {
   readonly message: string;
 }
 
-interface WorkspaceNotFoundError extends BaseWorkspaceError {
+export interface WorkspaceNotFoundError extends BaseWorkspaceError {
   readonly type: 'WORKSPACE_NOT_FOUND';
   readonly workspaceId: string;
 }
 
-interface InvalidWorkspaceNameError extends BaseWorkspaceError {
+export interface InvalidWorkspaceNameError extends BaseWorkspaceError {
   readonly type: 'INVALID_WORKSPACE_NAME';
   readonly invalidValue: string;
   readonly reason: string;
 }
 
-interface InvalidWorkspaceRoleError extends BaseWorkspaceError {
+export interface InvalidWorkspaceRoleError extends BaseWorkspaceError {
   readonly type: 'INVALID_WORKSPACE_ROLE';
   readonly invalidValue: string;
   readonly reason: string;
 }
 
-interface WorkspaceUserAlreadyExistsError extends BaseWorkspaceError {
+export interface WorkspaceUserAlreadyExistsError extends BaseWorkspaceError {
   readonly type: 'WORKSPACE_USER_ALREADY_EXISTS';
   readonly userId: string;
   readonly workspaceId: string;
 }
 
 // TODO сделать юзкейс
-interface CannotModifyDeletedWorkspaceError extends BaseWorkspaceError {
+export interface CannotModifyDeletedWorkspaceError extends BaseWorkspaceError {
   readonly type: 'WORKSPACE_CANNOT_MODIFY_DELETED';
   readonly workspaceId: string;
-}
-
-export interface InvalidObjectInDatabaseError extends BaseWorkspaceError {
-  readonly type: 'INVALID_OBJECT_IN_DATABASE';
-  readonly object: unknown;
-  readonly schemaName: string;
-  readonly reason: string;
-}
-
-interface UnexpectedDatabaseError extends BaseWorkspaceError {
-  readonly type: 'UNEXPECTED_DATABASE_ERROR';
-  readonly error: unknown;
 }
 
 export interface InvalidRoleError extends BaseWorkspaceError {
@@ -61,17 +51,16 @@ export interface NotPermissionToAddNewUseError extends BaseWorkspaceError {
 	readonly workspaceId: string;
 }
 
-export type WorkspaceDomainError =
+export type WorkspaceDomainError = DomainError<
   | WorkspaceNotFoundError
   | InvalidWorkspaceNameError
   | InvalidWorkspaceRoleError
   | WorkspaceUserAlreadyExistsError
   | CannotModifyDeletedWorkspaceError
-  | InvalidObjectInDatabaseError
-  | UnexpectedDatabaseError
-	| InvalidRoleError
-	| WorkspaceUserNotFoundError
-	| NotPermissionToAddNewUseError;
+  | InvalidRoleError
+  | WorkspaceUserNotFoundError
+  | NotPermissionToAddNewUseError
+>
 
 export const createWorkspaceNotFoundError = (workspaceId: string): WorkspaceNotFoundError => ({
   type: 'WORKSPACE_NOT_FOUND',
@@ -106,23 +95,6 @@ export const createCannotModifyDeletedWorkspaceError = (workspaceId: string): Ca
   workspaceId,
 });
 
-export const createInvalidObjectInDatabaseError = (
-  object: unknown,
-  schemaName: string,
-  reason: string
-): InvalidObjectInDatabaseError => ({
-  type: 'INVALID_OBJECT_IN_DATABASE',
-  message: `Invalid object in database: ${JSON.stringify(object)}, schema: ${schemaName}`,
-  object,
-  schemaName,
-  reason
-});
-
-export const createUnexpectedDatabaseError = (error: unknown): UnexpectedDatabaseError => ({
-  type: 'UNEXPECTED_DATABASE_ERROR',
-  message: 'Unexpected database error',
-  error,
-});
 
 export const createInvalidRoleError = (role: string, reason: string): InvalidRoleError => ({
 	type: 'INVALID_ROLE',
@@ -164,14 +136,6 @@ export const isWorkspaceUserAlreadyExistsError = (
 export const isCannotModifyDeletedWorkspaceError = (
   error: WorkspaceDomainError
 ): error is CannotModifyDeletedWorkspaceError => error.type === 'WORKSPACE_CANNOT_MODIFY_DELETED';
-
-export const isInvalidObjectInDatabaseError = (
-  error: WorkspaceDomainError
-): error is InvalidObjectInDatabaseError => error.type === 'INVALID_OBJECT_IN_DATABASE';
-
-export const isUnexpectedDatabaseError = (
-  error: WorkspaceDomainError
-): error is UnexpectedDatabaseError => error.type === 'UNEXPECTED_DATABASE_ERROR';
 
 export const isInvalidRoleError = (
 	error: WorkspaceDomainError

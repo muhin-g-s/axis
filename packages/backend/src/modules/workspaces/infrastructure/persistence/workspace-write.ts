@@ -8,9 +8,11 @@ import type { WorkspaceId } from '../../domain/value-objects/workspace-id';
 import type { WorkspaceUser } from '../../domain/entities/workspace-user';
 import type { WorkspaceWriteRepository } from '../../domain/repositories/write';
 import {
-  createUnexpectedDatabaseError,
   type WorkspaceDomainError,
 } from '../../domain/errors';
+import {
+  createUnexpectedDatabaseError,
+} from '@backend/libs/error';
 
 export class DrizzleWorkspaceWriteRepository implements WorkspaceWriteRepository {
   constructor(private readonly db: DbClient) {}

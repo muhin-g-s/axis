@@ -9,12 +9,14 @@ import type { WorkspaceId } from "../../domain/value-objects/workspace-id";
 import { validate } from "@backend/libs/validation";
 import {
 	type WorkspaceDomainError,
-	type InvalidObjectInDatabaseError,
-	createInvalidObjectInDatabaseError,
-	createUnexpectedDatabaseError,
 	createWorkspaceNotFoundError,
 	createWorkspaceUserNotFoundError,
 } from "../../domain/errors";
+import {
+	createInvalidObjectInDatabaseError,
+	type InvalidObjectInDatabaseError,
+	createUnexpectedDatabaseError
+} from "@backend/libs/error";
 import type { WorkspaceReadRepository } from "../../domain/repositories/read";
 
 interface WorkspaceUserQueryResult {

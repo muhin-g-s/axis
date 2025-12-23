@@ -8,12 +8,14 @@ import type { ProjectId } from '../../domain/value-objects/id';
 import type { WorkspaceId } from '../../domain/value-objects/workspace-id';
 import type { ProjectReadRepository } from '../../domain/repositories/read';
 import {
-	createInvalidObjectInDatabaseError,
 	createProjectNotFoundError,
 	type ProjectDomainError,
+} from '../../domain/errors';
+import {
+	createInvalidObjectInDatabaseError,
 	type InvalidObjectInDatabaseError,
 	createUnexpectedDatabaseError
-} from '../../domain/errors';
+} from '@backend/libs/error';
 import { validate } from '@backend/libs/validation';
 
 export class DrizzleProjectReadRepository
