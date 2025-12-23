@@ -9,4 +9,5 @@ export interface WorkspaceReadRepository {
   findById(id: WorkspaceId): Promise<Result<Workspace, WorkspaceDomainError>>;
   findWorkspaceUsersByUserId(userId: UserId): Promise<Result<WorkspaceUser[], WorkspaceDomainError>>;
   findWorkspaceUsersByWorkspaceId(workspaceId: WorkspaceId): Promise<Result<WorkspaceUser[], WorkspaceDomainError>>;
+	findByUserIdAndWorkspaceId(userId: UserId, workspaceId: WorkspaceId): Promise<Result<WorkspaceUser, WorkspaceDomainError>>;
 }

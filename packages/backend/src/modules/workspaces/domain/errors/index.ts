@@ -31,7 +31,7 @@ interface CannotModifyDeletedWorkspaceError extends BaseWorkspaceError {
   readonly workspaceId: string;
 }
 
-interface InvalidObjectInDatabaseError extends BaseWorkspaceError {
+export interface InvalidObjectInDatabaseError extends BaseWorkspaceError {
   readonly type: 'INVALID_OBJECT_IN_DATABASE';
   readonly object: unknown;
   readonly schemaName: string;
@@ -49,6 +49,18 @@ export interface InvalidRoleError extends BaseWorkspaceError {
 	readonly reason: string;
 }
 
+export interface WorkspaceUserNotFoundError extends BaseWorkspaceError {
+	readonly type: 'WORKSPACE_USER_NOT_FOUND';
+	readonly userId: string;
+	readonly workspaceId: string;
+}
+
+export interface NotPermissionToAddNewUseError extends BaseWorkspaceError {
+	readonly type: 'NOT_PERMISSION_TO_ADD_NEW_USER_TO_WORKSPACE';
+	readonly userId: string;
+	readonly workspaceId: string;
+}
+
 export type WorkspaceDomainError =
   | WorkspaceNotFoundError
   | InvalidWorkspaceNameError
@@ -57,7 +69,9 @@ export type WorkspaceDomainError =
   | CannotModifyDeletedWorkspaceError
   | InvalidObjectInDatabaseError
   | UnexpectedDatabaseError
-	| InvalidRoleError;
+	| InvalidRoleError
+	| WorkspaceUserNotFoundError
+	| NotPermissionToAddNewUseError;
 
 export const createWorkspaceNotFoundError = (workspaceId: string): WorkspaceNotFoundError => ({
   type: 'WORKSPACE_NOT_FOUND',
@@ -117,6 +131,20 @@ export const createInvalidRoleError = (role: string, reason: string): InvalidRol
 	reason
 });
 
+export const createWorkspaceUserNotFoundError = (userId: string, workspaceId: string): WorkspaceUserNotFoundError => ({
+	type: 'WORKSPACE_USER_NOT_FOUND',
+	message: `User ${userId} not found in workspace ${workspaceId}`,
+	userId,
+	workspaceId,
+});
+
+export const createNotPermissionToAddNewUseError = (userId: string, workspaceId: string): NotPermissionToAddNewUseError => ({
+	type: 'NOT_PERMISSION_TO_ADD_NEW_USER_TO_WORKSPACE',
+	message: `User ${userId} not have permission to add new user to workspace ${workspaceId}`,
+	userId,
+	workspaceId,
+});
+
 export const isWorkspaceNotFoundError = (
   error: WorkspaceDomainError
 ): error is WorkspaceNotFoundError => error.type === 'WORKSPACE_NOT_FOUND';
@@ -148,3 +176,11 @@ export const isUnexpectedDatabaseError = (
 export const isInvalidRoleError = (
 	error: WorkspaceDomainError
 ): error is InvalidRoleError => error.type === 'INVALID_ROLE';
+
+export const isWorkspaceUserNotFoundError = (
+	error: WorkspaceDomainError
+): error is WorkspaceUserNotFoundError => error.type === 'WORKSPACE_USER_NOT_FOUND';
+
+export const isNotPermissionToAddNewUseError = (
+	error: WorkspaceDomainError
+): error is NotPermissionToAddNewUseError => error.type === 'NOT_PERMISSION_TO_ADD_NEW_USER_TO_WORKSPACE';

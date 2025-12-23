@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { UserIdSchema, type UserId } from '../value-objects/user-id';
 import { WorkspaceIdSchema, type WorkspaceId } from '../value-objects/workspace-id';
-import { type UserRole, RoleSchema } from '../value-objects/role';
+import { isAdmin, RoleSchema, type UserRole } from '../value-objects/role';
 import { TimestampSchema, VersionSchema, type Timestamp } from '@backend/libs/primitives';
 import { createVersion, incVersion } from '@backend/libs/version';
 
@@ -45,9 +45,6 @@ export function changeRole(
   };
 }
 
-export function workspaceUserEquals(
-  a: WorkspaceUser,
-  b: WorkspaceUser
-): boolean {
-  return a.userId === b.userId && a.workspaceId === b.workspaceId;
+export function canAddNewMember(workspaceUser: WorkspaceUser): boolean {
+	return isAdmin(workspaceUser.role);
 }

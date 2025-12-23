@@ -1,14 +1,20 @@
 import type { DbClient } from "@backend/app/db/connector";
 import { workspaces, workspaceUsers } from "@backend/app/db/schema";
 import { Result } from "@backend/libs/result";
-import { createInvalidObjectInDatabaseError, createUnexpectedDatabaseError, type InvalidObjectInDatabaseError } from "@backend/modules/identity/domain/errors";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { type Workspace, WorkspaceSchema } from "../../domain/entities/workspace";
 import { WorkspaceUserSchema, type WorkspaceUser } from "../../domain/entities/workspace-user";
 import type { UserId } from "../../domain/value-objects/user-id";
 import type { WorkspaceId } from "../../domain/value-objects/workspace-id";
 import { validate } from "@backend/libs/validation";
-import { type WorkspaceDomainError, createWorkspaceNotFoundError } from "../../domain/errors";
+import {
+	type WorkspaceDomainError,
+	type InvalidObjectInDatabaseError,
+	createInvalidObjectInDatabaseError,
+	createUnexpectedDatabaseError,
+	createWorkspaceNotFoundError,
+	createWorkspaceUserNotFoundError,
+} from "../../domain/errors";
 import type { WorkspaceReadRepository } from "../../domain/repositories/read";
 
 interface WorkspaceUserQueryResult {
@@ -75,6 +81,35 @@ export class DrizzleWorkspaceReadRepository implements WorkspaceReadRepository {
       return Result.err(createUnexpectedDatabaseError(error));
     }
   }
+
+	async findByUserIdAndWorkspaceId(userId: UserId, workspaceId: WorkspaceId): Promise<Result<WorkspaceUser, WorkspaceDomainError>> {
+		try {
+			const workspaceUserRecord = await this.db
+				.select()
+				.from(workspaceUsers)
+				.where(
+					and(
+						eq(workspaceUsers.userId, userId),
+						eq(workspaceUsers.workspaceId, workspaceId)
+					)
+				)
+				.limit(1);
+
+			if (workspaceUserRecord.length === 0) {
+				return Result.err(createWorkspaceUserNotFoundError(userId, workspaceId));
+			}
+
+			const validatedUser = validate<WorkspaceUser, InvalidObjectInDatabaseError>(
+				WorkspaceUserSchema,
+				workspaceUserRecord[0],
+				msg => createInvalidObjectInDatabaseError(workspaceUserRecord[0], 'WorkspaceUserSchema', msg)
+			);
+
+			return validatedUser;
+		} catch (error) {
+			return Result.err(createUnexpectedDatabaseError(error));
+		}
+	}
 
 	private validateWorkspaceUsers(workspaceUsers: WorkspaceUserQueryResult[]): Result<WorkspaceUser[], WorkspaceDomainError> {
 		for (const workspaceUser of workspaceUsers) {

@@ -17,3 +17,10 @@ export interface UserWorkspace {
   readonly name: WorkspaceName;
   readonly role: UserRole;
 }
+
+export interface AddUserToWorkspaceCommand {
+	readonly newUserId: UserId;
+	readonly actorUserId: UserId;
+	readonly workspaceId: WorkspaceId;
+	readonly role: UserRole;
+}
