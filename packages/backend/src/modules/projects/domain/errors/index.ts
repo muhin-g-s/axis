@@ -34,13 +34,49 @@ export interface UnexpectedDatabaseError extends BaseProjectError {
 	readonly error: unknown;
 }
 
+export interface UnexpectedError extends BaseProjectError {
+	readonly type: 'UNEXPECTED_ERROR';
+	readonly error: unknown;
+}
+
+export interface CannotCreateProjectError extends BaseProjectError {
+	readonly type: 'CANNOT_CREATE_PROJECT';
+	readonly userId: string;
+}
+
+export interface CannotDeleteProjectError extends BaseProjectError {
+	readonly type: 'CANNOT_DELETE_PROJECT';
+	readonly userId: string;
+}
+
+export interface CannotModifyProjectError extends BaseProjectError {
+	readonly type: 'CANNOT_MODIFY_PROJECT';
+	readonly userId: string;
+}
+
+export interface CannotViewProjectError extends BaseProjectError {
+	readonly type: 'CANNOT_VIEW_PROJECT';
+	readonly userId: string;
+}
+
+export interface CannotAccessProjectError extends BaseProjectError {
+	readonly type: 'CANNOT_ACCESS_PROJECT';
+	readonly userId: string;
+}
+
 export type ProjectDomainError =
   | ProjectNotFoundError
   | InvalidProjectNameError
   | OptimisticLockError
   | CannotModifyDeletedProjectError
 	| InvalidObjectInDatabaseError
-	| UnexpectedDatabaseError;
+	| UnexpectedDatabaseError
+	| UnexpectedError
+	| CannotCreateProjectError
+	| CannotDeleteProjectError
+	| CannotModifyProjectError
+	| CannotViewProjectError
+	| CannotAccessProjectError;
 
 
 export const createProjectNotFoundError = (projectId: string): ProjectNotFoundError => ({
@@ -81,6 +117,42 @@ export const createUnexpectedDatabaseError = (error: unknown): UnexpectedDatabas
 	error,
 });
 
+export const createUnexpectedError = (error: unknown): UnexpectedError => ({
+	type: 'UNEXPECTED_ERROR',
+	message: `Unexpected error: ${JSON.stringify(error)}`,
+	error,
+});
+
+export const createCannotCreateProjectError = (userId: string): CannotCreateProjectError => ({
+	type: 'CANNOT_CREATE_PROJECT',
+	message: `Cannot create project because user ${userId} is not a member of any workspace`,
+	userId,
+});
+
+export const createCannotDeleteProjectError = (userId: string): CannotDeleteProjectError => ({
+	type: 'CANNOT_DELETE_PROJECT',
+	message: `Cannot delete project because user ${userId} is not a member of any workspace`,
+	userId,
+});
+
+export const createCannotModifyProjectError = (userId: string): CannotModifyProjectError => ({
+	type: 'CANNOT_MODIFY_PROJECT',
+	message: `Cannot modify project because user ${userId} is not a member of any workspace`,
+	userId,
+});
+
+export const createCannotViewProjectError = (userId: string): CannotViewProjectError => ({
+	type: 'CANNOT_VIEW_PROJECT',
+	message: `Cannot view project because user ${userId} is not a member of any workspace`,
+	userId,
+});
+
+export const createCannotAccessProjectError = (userId: string): CannotAccessProjectError => ({
+	type: 'CANNOT_ACCESS_PROJECT',
+	message: `Cannot access project because user ${userId} is not a member of any workspace`,
+	userId,
+});
+
 export const isProjectNotFoundError = (
   error: ProjectDomainError
 ): error is ProjectNotFoundError => error.type === 'PROJECT_NOT_FOUND';
@@ -104,3 +176,27 @@ export const isInvalidObjectInDatabaseError = (
 export const isUnexpectedDatabaseError = (
 	error: ProjectDomainError
 ): error is UnexpectedDatabaseError => error.type === 'UNEXPECTED_DATABASE_ERROR';
+
+export const isUnexpectedError = (
+	error: ProjectDomainError
+): error is UnexpectedError => error.type === 'UNEXPECTED_ERROR';
+
+export const isCannotCreateProjectError = (
+	error: ProjectDomainError
+): error is CannotCreateProjectError => error.type === 'CANNOT_CREATE_PROJECT';
+
+export const isCannotDeleteProjectError = (
+	error: ProjectDomainError
+): error is CannotDeleteProjectError => error.type === 'CANNOT_DELETE_PROJECT';
+
+export const isCannotModifyProjectError = (
+	error: ProjectDomainError
+): error is CannotModifyProjectError => error.type === 'CANNOT_MODIFY_PROJECT';
+
+export const isCannotViewProjectError = (
+	error: ProjectDomainError
+): error is CannotViewProjectError => error.type === 'CANNOT_VIEW_PROJECT';
+
+export const isCannotAccessProjectError = (
+	error: ProjectDomainError
+): error is CannotAccessProjectError => error.type === 'CANNOT_ACCESS_PROJECT';

@@ -6,17 +6,24 @@ import type { RenameProjectCommand } from "../dto";
 import { rename } from "../../domain/entities";
 import { createCannotModifyDeletedProjectError } from "../../domain/errors";
 import type { ProjectDomainError } from "../../domain/errors";
+import type { IProjectPermissionChecker } from "../../domain/services/project-permission-checker";
 
 export class RenameProjectHandler {
   constructor(
     private readonly readRepo: ProjectReadRepository,
     private readonly uow: UnitOfWork,
+		private readonly projectPermissionChecker: IProjectPermissionChecker,
     private readonly now: () => Timestamp,
   ) {}
 
-  async handle(command: RenameProjectCommand): Promise<Result<void, ProjectDomainError>> {
+  async handle({actorUserId, workspaceId, id, newName}: RenameProjectCommand): Promise<Result<void, ProjectDomainError>> {
+		const canDeleteProjectResult = await this.projectPermissionChecker.canViewProject(actorUserId, workspaceId);
+		if (!canDeleteProjectResult.ok) {
+			return canDeleteProjectResult
+		}
+
     const result = await this.uow.run(async (uow) => {
-      const findResult = await this.readRepo.findById(command.id);
+      const findResult = await this.readRepo.findById(id);
       if (!findResult.ok) {
         return Result.err(findResult.error);
       }
@@ -24,10 +31,10 @@ export class RenameProjectHandler {
       const project = findResult.value;
 
 			if (project.deletedAt !== undefined) {
-				return Result.err(createCannotModifyDeletedProjectError(command.id));
+				return Result.err(createCannotModifyDeletedProjectError(id));
 			}
 
-      const updatedProject = rename(project, command.newName, this.now());
+      const updatedProject = rename(project, newName, this.now());
 
       const saveResult = await uow.projects.save(updatedProject, project.version);
       if (!saveResult.ok) {

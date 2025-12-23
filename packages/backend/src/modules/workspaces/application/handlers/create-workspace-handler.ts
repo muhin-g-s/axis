@@ -33,8 +33,8 @@ export class CreateWorkspaceHandler {
 
     const result = await this.uow.run(async uow => {
      const [workspaceSaveResult, workspaceUserSaveResult] = await Promise.all([
-				uow.workspaces.saveWorkspace(workspace, workspace.version),
-				uow.workspaces.saveWorkspaceUser(workspaceUser, workspaceUser.version),
+				uow.workspaces.saveWorkspace(workspace),
+				uow.workspaces.saveWorkspaceUser(workspaceUser),
 			]);
 
 			if (!workspaceSaveResult.ok) {

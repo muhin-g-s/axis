@@ -2,15 +2,13 @@ import { type } from 'arktype';
 import { UserIdSchema, type UserId } from '../value-objects/user-id';
 import { WorkspaceIdSchema, type WorkspaceId } from '../value-objects/workspace-id';
 import { isAdmin, RoleSchema, type UserRole } from '../value-objects/role';
-import { TimestampSchema, VersionSchema, type Timestamp } from '@backend/libs/primitives';
-import { createVersion, incVersion } from '@backend/libs/version';
+import { TimestampSchema, type Timestamp } from '@backend/libs/primitives';
 
 export const WorkspaceUserSchema = type({
   userId: UserIdSchema,
   workspaceId: WorkspaceIdSchema,
   role: RoleSchema,
   assignedAt: TimestampSchema,
-  version: VersionSchema,
 });
 
 export type WorkspaceUser = typeof WorkspaceUserSchema.infer;
@@ -26,7 +24,6 @@ export function createWorkspaceUser(
     workspaceId,
     role,
     assignedAt,
-    version: createVersion(),
   };
 }
 
@@ -41,7 +38,6 @@ export function changeRole(
   return {
     ...workspaceUser,
     role: newRole,
-    version: incVersion(workspaceUser.version),
   };
 }
 
