@@ -1,6 +1,6 @@
 import { sqliteTable, text, primaryKey } from "drizzle-orm/sqlite-core";
 import { issues } from "./issues";
-import { labels } from "./labels";
+import { workspaceLabels } from "./workspace-labels";
 
 export const issueLabels = sqliteTable(
   "issue_labels",
@@ -10,7 +10,7 @@ export const issueLabels = sqliteTable(
       .references(() => issues.id),
     labelId: text("label_id")
       .notNull()
-      .references(() => labels.id),
+      .references(() => workspaceLabels.id),
   },
   (table) => ({
     pk: primaryKey({
