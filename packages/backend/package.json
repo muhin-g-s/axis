@@ -7,7 +7,11 @@
     "build": "tsdown",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+		"db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/db/seed.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
