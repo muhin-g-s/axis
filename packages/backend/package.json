@@ -8,7 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.mjs",
     "typecheck": "tsc --noEmit",
-		"db:generate": "drizzle-kit generate",
+    "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed.ts"
@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@ark/util": "^0.56.0",
+    "@trpc/server": "^11.8.1",
     "arktype": "^2.1.29",
     "bcrypt": "^6.0.0",
     "drizzle-orm": "^0.45.1",
