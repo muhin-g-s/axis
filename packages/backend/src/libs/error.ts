@@ -1,21 +1,21 @@
-interface BaseUserError {
+interface BaseError {
   readonly message: string;
 	readonly type: string
 }
 
-export interface InvalidObjectInDatabaseError extends BaseUserError {
+export interface InvalidObjectInDatabaseError extends BaseError {
 	readonly type: 'INVALID_OBJECT_IN_DATABASE';
 	readonly object: unknown;
 	readonly schemaName: string;
 	readonly reason: string;
 }
 
-export interface UnexpectedDatabaseError extends BaseUserError {
+export interface UnexpectedDatabaseError extends BaseError {
 	readonly type: 'UNEXPECTED_DATABASE_ERROR';
 	readonly error: unknown;
 }
 
-export interface UnexpectedError extends BaseUserError {
+export interface UnexpectedError extends BaseError {
 	readonly type: 'UNEXPECTED_ERROR';
 	readonly error: unknown;
 }
@@ -25,7 +25,7 @@ export type NotDomainSpecificError =
 	| UnexpectedDatabaseError
 	| UnexpectedError;
 
-export type DomainError<DomainSpecificError extends BaseUserError> = DomainSpecificError | NotDomainSpecificError;
+export type DomainError<DomainSpecificError extends BaseError> = DomainSpecificError | NotDomainSpecificError;
 
 export const createInvalidObjectInDatabaseError = (object: unknown, schemaName: string, reason: string): InvalidObjectInDatabaseError => ({
 	type: 'INVALID_OBJECT_IN_DATABASE',
@@ -59,3 +59,10 @@ export const isUnexpectedDatabaseError = (
 export const isUnexpectedError = (
 	error: NotDomainSpecificError
 ): error is UnexpectedError => error.type === 'UNEXPECTED_ERROR';
+
+export const isNotDomainSpecificError = <T extends BaseError>(
+	error: DomainError<T>
+): error is NotDomainSpecificError =>
+	error.type === 'INVALID_OBJECT_IN_DATABASE' ||
+	error.type === 'UNEXPECTED_DATABASE_ERROR' ||
+	error.type === 'UNEXPECTED_ERROR';

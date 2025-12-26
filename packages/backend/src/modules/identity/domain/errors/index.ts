@@ -24,21 +24,9 @@ export interface UserAlreadyExistsError extends BaseUserError {
   readonly identifier: string;
 }
 
-export interface WorkspaceUserAlreadyExistsError extends BaseUserError {
-  readonly type: 'WORKSPACE_USER_ALREADY_EXISTS';
-  readonly userId: string;
-  readonly workspaceId: string;
-}
-
 export interface InvalidPasswordError extends BaseUserError {
 	readonly type: 'INVALID_PASSWORD';
 	readonly invalidPassword: string;
-	readonly reason: string;
-}
-
-export interface InvalidRoleError extends BaseUserError {
-	readonly type: 'INVALID_ROLE';
-	readonly role: string;
 	readonly reason: string;
 }
 
@@ -57,10 +45,8 @@ export type IdentityDomainError = DomainError<
 	| UserNotFoundError
   | InvalidCredentialsError
   | UserAlreadyExistsError
-  | WorkspaceUserAlreadyExistsError
 	| InvalidEmailError
 	| InvalidPasswordError
-	| InvalidRoleError
 	| InvalidUsernameError
 	| UserHasBeenDeletedError
 >
@@ -88,16 +74,6 @@ export const createUserAlreadyExistsError = (
   identifier,
 });
 
-export const createWorkspaceUserAlreadyExistsError = (
-  userId: string,
-  workspaceId: string
-): WorkspaceUserAlreadyExistsError => ({
-  type: 'WORKSPACE_USER_ALREADY_EXISTS',
-  message: `User ${userId} is already added to workspace ${workspaceId}`,
-  userId,
-  workspaceId,
-});
-
 export const createInvalidEmailError = (email: string, reason: string): InvalidEmailError => ({
 	type: 'INVALID_EMAIL',
 	message: `Invalid email ${email}`,
@@ -109,13 +85,6 @@ export const createInvalidPasswordError = (invalidPassword: string, reason: stri
 	type: 'INVALID_PASSWORD',
 	message: `Invalid password ${invalidPassword}`,
 	invalidPassword,
-	reason
-});
-
-export const createInvalidRoleError = (role: string, reason: string): InvalidRoleError => ({
-	type: 'INVALID_ROLE',
-	message: `Invalid role ${role}`,
-	role,
 	reason
 });
 
@@ -147,11 +116,6 @@ export const isUserAlreadyExistsError = (
 ): error is UserAlreadyExistsError =>
   error.type === 'USER_ALREADY_EXISTS';
 
-export const isWorkspaceUserAlreadyExistsError = (
-  error: IdentityDomainError
-): error is WorkspaceUserAlreadyExistsError =>
-  error.type === 'WORKSPACE_USER_ALREADY_EXISTS';
-
 export const isInvalidEmailError = (
 	error: IdentityDomainError
 ): error is InvalidEmailError => error.type === 'INVALID_EMAIL';
@@ -159,10 +123,6 @@ export const isInvalidEmailError = (
 export const isInvalidPasswordError = (
 	error: IdentityDomainError
 ): error is InvalidPasswordError => error.type === 'INVALID_PASSWORD';
-
-export const isInvalidRoleError = (
-	error: IdentityDomainError
-): error is InvalidRoleError => error.type === 'INVALID_ROLE';
 
 export const isInvalidUsernameError = (
 	error: IdentityDomainError

@@ -48,4 +48,10 @@ export const Result = {
       .with({ ok: false }, () => defaultValue)
       .exhaustive();
   },
+
+	unwrapOrThrow<T, E>(result: Result<T, E>, errCreator: (error: E) => Error): T {
+		if (result.ok) return result.value;
+		throw errCreator(result.error);
+	}
+
 } as const;

@@ -1,11 +1,31 @@
-import { TestController } from "../controllers/test";
+import { LoginUserHandler } from "@backend/modules/identity/application/commands/login-user-command";
+import { LoginController } from "../controllers/identity/login";
+import { BcryptPasswordHasher } from "@backend/modules/identity/infrastructure/service/password-hasher";
+import { DrizzleUserReadRepository } from "@backend/modules/identity/infrastructure/persistence/user-read";
+import { db } from "../db/connector";
 
-export interface Container  {
-  testController: TestController;
-};
+interface Identity {
+	login: LoginController
+}
+
+export type Container = Identity;
 
 export function createContainer(): Container {
+	const identity = createIdentity();
+
   return {
-    testController: new TestController(),
+		...identity
   };
+}
+
+function createIdentity(): Identity {
+	const passwordHasher = new BcryptPasswordHasher(10);
+
+	const userReadRepo = new DrizzleUserReadRepository(db);
+
+	const loginUserHandlerUc = new LoginUserHandler(userReadRepo, passwordHasher);
+
+	return {
+		login: new LoginController(loginUserHandlerUc),
+	};
 }
