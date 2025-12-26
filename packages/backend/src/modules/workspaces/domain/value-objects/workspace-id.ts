@@ -1,4 +1,4 @@
-import { createId, createIdSchema } from '@backend/libs/id';
+import { createId, createIdSchema, fromStringFactory } from '@backend/libs/id';
 
 const brand = 'WorkspaceId';
 
@@ -11,3 +11,5 @@ export type WorkspaceId = typeof WorkspaceIdSchema.infer;
 export function createWorkspaceId(): WorkspaceId {
   return createId<Brand>();
 }
+
+export const workspaceIdFromString = fromStringFactory(WorkspaceIdSchema);

@@ -20,10 +20,17 @@ export interface UnexpectedError extends BaseError {
 	readonly error: unknown;
 }
 
+export interface InvalidIdFormatError extends BaseError {
+	readonly type: 'INVALID_ID_FORMAT';
+	readonly id: string;
+	readonly reason: string;
+}
+
 export type NotDomainSpecificError =
 	| InvalidObjectInDatabaseError
 	| UnexpectedDatabaseError
-	| UnexpectedError;
+	| UnexpectedError
+	| InvalidIdFormatError;
 
 export type DomainError<DomainSpecificError extends BaseError> = DomainSpecificError | NotDomainSpecificError;
 
@@ -47,6 +54,13 @@ export const createUnexpectedError = (error: unknown): UnexpectedError => ({
 	error,
 });
 
+export const createInvalidIdFormatError = (id: string, reason: string): InvalidIdFormatError => ({
+	type: 'INVALID_ID_FORMAT',
+	message: `Invalid id format: ${id}`,
+	id,
+	reason,
+});
+
 export const isInvalidObjectInDatabaseError = (
 	error: NotDomainSpecificError
 ): error is InvalidObjectInDatabaseError => error.type === 'INVALID_OBJECT_IN_DATABASE';
@@ -60,9 +74,14 @@ export const isUnexpectedError = (
 	error: NotDomainSpecificError
 ): error is UnexpectedError => error.type === 'UNEXPECTED_ERROR';
 
+export const isInvalidIdFormatError = (
+	error: NotDomainSpecificError
+): error is InvalidIdFormatError => error.type === 'INVALID_ID_FORMAT';
+
 export const isNotDomainSpecificError = <T extends BaseError>(
 	error: DomainError<T>
 ): error is NotDomainSpecificError =>
 	error.type === 'INVALID_OBJECT_IN_DATABASE' ||
 	error.type === 'UNEXPECTED_DATABASE_ERROR' ||
-	error.type === 'UNEXPECTED_ERROR';
+	error.type === 'UNEXPECTED_ERROR' ||
+	error.type === 'INVALID_ID_FORMAT';

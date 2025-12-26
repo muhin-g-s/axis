@@ -148,3 +148,4 @@ export const isWorkspaceUserNotFoundError = (
 export const isNotPermissionToAddNewUseError = (
 	error: WorkspaceDomainError
 ): error is NotPermissionToAddNewUseError => error.type === 'NOT_PERMISSION_TO_ADD_NEW_USER_TO_WORKSPACE';
+

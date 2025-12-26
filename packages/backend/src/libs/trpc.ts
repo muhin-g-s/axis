@@ -7,10 +7,12 @@ import {
 	type NotDomainSpecificError,
 	type UnexpectedDatabaseError,
 	type UnexpectedError,
+	isInvalidIdFormatError,
+	type InvalidIdFormatError,
 } from "./error";
 import { match } from "ts-pattern";
 
-export interface Request<Input extends Record<string, unknown>, Ctx = unknown> {
+export interface Request<Input extends object, Ctx = unknown> {
 	ctx: Ctx;
 	input: Input;
 	signal: AbortSignal | undefined;
@@ -34,6 +36,7 @@ export function notDomainErrorToTRPC(err: NotDomainSpecificError): TRPCError {
 		.when(isInvalidObjectInDatabaseError, InvalidObjectInDatabaseErrorToTRPC)
 		.when(isUnexpectedDatabaseError, UnexpectedDatabaseErrorToTRPC)
 		.when(isUnexpectedError, UnexpectedErrorToTRPC)
+		.when(isInvalidIdFormatError, InvalidIdFormatErrorToTRPC)
 		.exhaustive();
 }
 
@@ -58,6 +61,14 @@ function UnexpectedDatabaseErrorToTRPC(
 		code: 'INTERNAL_SERVER_ERROR',
 		message: err.message,
 		cause: err.error,
+	});
+}
+
+export function InvalidIdFormatErrorToTRPC(err: InvalidIdFormatError): TRPCError {
+	return new TRPCError({
+		code: 'BAD_REQUEST',
+		message: err.message,
+		cause: err.reason,
 	});
 }
 

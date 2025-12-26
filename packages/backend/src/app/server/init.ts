@@ -33,7 +33,6 @@ export function createContext(
 export interface AuthContext extends Context {
   user?: {
     id: string;
-    email: string;
   };
 }
 
