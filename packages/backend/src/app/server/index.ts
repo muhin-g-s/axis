@@ -11,7 +11,7 @@ const basePath = '/trpc/';
 export function createServer(container: Container): void {
 	const trpcHandler = createHTTPHandler({
 		router: appRouter,
-		createContext: () => createContext(container),
+		createContext: ({ req, res }) => createContext({ req, res }, container),
 		basePath,
 	});
 

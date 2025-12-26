@@ -3,9 +3,12 @@ import { LoginController } from "../controllers/identity/login";
 import { BcryptPasswordHasher } from "@backend/modules/identity/infrastructure/service/password-hasher";
 import { DrizzleUserReadRepository } from "@backend/modules/identity/infrastructure/persistence/user-read";
 import { db } from "../db/connector";
+import type { JwtService } from "../service/jwt/interface";
+import { JwtServiceMock } from "../service/jwt/mock";
 
-interface Identity {
+export interface Identity {
 	login: LoginController
+	jwt: JwtService
 }
 
 export type Container = Identity;
@@ -25,7 +28,10 @@ function createIdentity(): Identity {
 
 	const loginUserHandlerUc = new LoginUserHandler(userReadRepo, passwordHasher);
 
+	const jwt = new JwtServiceMock();
+
 	return {
-		login: new LoginController(loginUserHandlerUc),
+		login: new LoginController(loginUserHandlerUc, jwt),
+		jwt,
 	};
 }

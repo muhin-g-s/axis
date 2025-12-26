@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@preact/signals": "2.5.1",
+    "@trpc/client": "^11.8.1",
     "preact": "^10.27.2",
     "wouter-preact": "^3.8.1"
   },

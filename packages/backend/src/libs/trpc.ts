@@ -17,6 +17,18 @@ export interface Request<Input extends Record<string, unknown>, Ctx = unknown> {
 	path: string;
 }
 
+export function createUnauthorizedErr(): TRPCError {
+	return new TRPCError({ code: "UNAUTHORIZED" });
+}
+
+export function createUnexpectedErr(msg: string, cause?: unknown): TRPCError {
+	return new TRPCError({
+		code: 'INTERNAL_SERVER_ERROR',
+		message: msg,
+		cause: cause
+	});
+}
+
 export function notDomainErrorToTRPC(err: NotDomainSpecificError): TRPCError {
 	return match(err)
 		.when(isInvalidObjectInDatabaseError, InvalidObjectInDatabaseErrorToTRPC)
@@ -50,9 +62,5 @@ function UnexpectedDatabaseErrorToTRPC(
 }
 
 function UnexpectedErrorToTRPC(err: UnexpectedError): TRPCError {
-	return new TRPCError({
-		code: 'INTERNAL_SERVER_ERROR',
-		message: err.message,
-		cause: err.error,
-	});
+	return createUnexpectedErr(err.message, err.error);
 }
