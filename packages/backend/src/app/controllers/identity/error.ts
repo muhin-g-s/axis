@@ -76,7 +76,7 @@ function UserAlreadyExistsErrorToTRPC(
 	});
 }
 
-function InvalidUsernameErrorToTRPC(
+export function InvalidUsernameErrorToTRPC(
 	err: InvalidUsernameError,
 ): TRPCError {
 	return new TRPCError({
