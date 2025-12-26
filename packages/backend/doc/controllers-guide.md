@@ -73,7 +73,31 @@ export const inputSchema = type({
 });
 ```
 
-### Step 2: Define Input and Output Types
+### Step 2: Choose Appropriate Context Type
+
+When your controller requires authentication, use `AuthContext` to access the authenticated user:
+
+```typescript
+import type { AuthContext } from "@backend/app/server/init";
+
+// In controller class
+async handler({ input, ctx }: Request<InputType, AuthContext>): Promise<OutputType> {
+  // Access authenticated user via ctx.user
+  const userId = ctx.user?.id;
+}
+```
+
+For controllers that don't require authentication, use `ContextHttp`:
+
+```typescript
+import type { ContextHttp } from "@backend/app/server/init";
+
+async handler({ input, ctx }: Request<InputType, ContextHttp>): Promise<OutputType> {
+  // Standard HTTP context without authentication
+}
+```
+
+### Step 3: Define Input and Output Types
 
 ```typescript
 type InputType = typeof inputSchema.infer
@@ -85,7 +109,7 @@ export interface OutputType {
 }
 ```
 
-### Step 3: Create the Controller Class
+### Step 4: Create the Controller Class
 
 ```typescript
 export class ControllerName {
@@ -93,15 +117,15 @@ export class ControllerName {
 		private readonly usecase: UseCaseHandler,
 		// Inject dependencies
 	) {}
-	
+
 	async handler({ input, ctx }: Request<InputType, ContextHttp>): Promise<OutputType> {
 		// Validate and create value objects
 		const emailVo = Result.unwrapOrThrow(
-			createEmail(input.email), 
+			createEmail(input.email),
 			InvalidEmailErrorToTRPC
 		);
 		const passwordVo = Result.unwrapOrThrow(
-			createPassword(input.password), 
+			createPassword(input.password),
 			InvalidPasswordErrorToTRPC
 		);
 
@@ -126,7 +150,7 @@ export class ControllerName {
 }
 ```
 
-### Step 4: Handle Special Cases (e.g., Authentication Headers)
+### Step 5: Handle Special Cases (e.g., Authentication Headers)
 
 For controllers that need to set headers (like authentication tokens):
 
@@ -140,6 +164,79 @@ const bearer = Result.unwrapOrThrow(
 );
 
 ctx.res.setHeader("Authorization", bearer);
+```
+
+### Step 6: Working with Value Objects and String Conversion
+
+For domain entities that use value objects, you may need to convert from strings and validate them:
+
+```typescript
+import { userIdFromString } from "@backend/modules/workspaces/domain/value-objects/user-id";
+import { workspaceIdFromString } from "@backend/modules/workspaces/domain/value-objects/workspace-id";
+import { createRole, type UserRole } from "@backend/modules/workspaces/domain/value-objects/role";
+import { InvalidIdFormatErrorToTRPC } from "@backend/libs/trpc";
+
+async handler({ input, ctx }: Request<InputType, AuthContext>): Promise<OutputType> {
+  // Convert string IDs to value objects with validation
+  const userIdVo = Result.unwrapOrThrow(
+    userIdFromString(input.userId),
+    InvalidIdFormatErrorToTRPC
+  );
+
+  const workspaceIdVo = Result.unwrapOrThrow(
+    workspaceIdFromString(input.workspaceId),
+    InvalidIdFormatErrorToTRPC
+  );
+
+  // Convert string role to typed role value object
+  const roleVo = Result.unwrapOrThrow(
+    createRole(input.role as UserRole),
+    InvalidRoleErrorToTRPC
+  );
+
+  // Use the validated value objects in your command
+  const command = {
+    userId: userIdVo,
+    workspaceId: workspaceIdVo,
+    role: roleVo,
+  };
+
+  // Execute use case
+  const result = Result.unwrapOrThrow(
+    await this.usecase.handle(command),
+    mapErr
+  );
+
+  return result;
+}
+```
+
+### Step 7: Implementing Actor-Based Authorization
+
+For operations that require authorization checks, extract the actor (authenticated user) and pass it to the command:
+
+```typescript
+async handler({ input, ctx }: Request<InputType, AuthContext>): Promise<OutputType> {
+  // Extract actor (current user) from context
+  const actorUserId = Result.unwrapOrThrow(
+    userIdFromString(ctx.user?.id ?? ""),
+    InvalidIdFormatErrorToTRPC
+  );
+
+  // Use actor ID for authorization checks in the use case
+  const command = {
+    actorUserId: actorUserId,
+    targetUserId: targetUserId,
+    workspaceId: workspaceId,
+  };
+
+  const result = Result.unwrapOrThrow(
+    await this.usecase.handle(command),
+    mapErr
+  );
+
+  return result;
+}
 ```
 
 ## Input Validation
@@ -164,9 +261,21 @@ Validate domain value objects using the `Result.unwrapOrThrow` pattern:
 
 ```typescript
 const emailVo = Result.unwrapOrThrow(
-	createEmail(input.email), 
+	createEmail(input.email),
 	InvalidEmailErrorToTRPC
 );
+```
+
+### Using Primitive Schemas
+
+For common validations like non-empty strings, you can use predefined schemas:
+
+```typescript
+import { NonEmptyStringSchema } from "@backend/libs/primitives";
+
+export const inputCreateWorkspaceSchema = type({
+  name: NonEmptyStringSchema, // Uses predefined non-empty string validation
+});
 ```
 
 ## Error Handling
@@ -185,6 +294,50 @@ export const InvalidEmailErrorToTRPC = () => TRPCError({
 export const mapErr = (err: DomainError) => {
 	// Map different error types to appropriate TRPC errors
 };
+```
+
+### Advanced Error Handling with Pattern Matching
+
+For modules with multiple specific error types (like workspaces), use ts-pattern for comprehensive error mapping:
+
+```typescript
+// error.ts
+import { TRPCError } from "@trpc/server";
+import { match } from "ts-pattern";
+import {
+  isWorkspaceNotFoundError,
+  isInvalidWorkspaceNameError,
+  isInvalidWorkspaceRoleError,
+  isWorkspaceUserAlreadyExistsError,
+  isCannotModifyDeletedWorkspaceError,
+  isInvalidRoleError,
+  isWorkspaceUserNotFoundError,
+  isNotPermissionToAddNewUseError,
+  type WorkspaceDomainError,
+} from "@backend/modules/workspaces/domain/errors";
+
+export function mapErr(err: WorkspaceDomainError): TRPCError {
+  return match(err)
+    .when(isInvalidWorkspaceNameError, InvalidWorkspaceNameErrorToTRPC)
+    .when(isInvalidWorkspaceRoleError, InvalidWorkspaceRoleErrorToTRPC)
+    .when(isWorkspaceUserAlreadyExistsError, WorkspaceUserAlreadyExistsErrorToTRPC)
+    .when(isWorkspaceNotFoundError, WorkspaceNotFoundErrorToTRPC)
+    .when(isCannotModifyDeletedWorkspaceError, CannotModifyDeletedWorkspaceErrorToTRPC)
+    .when(isInvalidRoleError, InvalidRoleErrorToTRPC)
+    .when(isWorkspaceUserNotFoundError, WorkspaceUserNotFoundErrorToTRPC)
+    .when(isNotPermissionToAddNewUseError, NotPermissionToAddNewUseErrorToTRPC)
+    .exhaustive();
+}
+
+export function InvalidRoleErrorToTRPC(
+  err: InvalidRoleError,
+): TRPCError {
+  return new TRPCError({
+    code: 'BAD_REQUEST',
+    message: err.message,
+    cause: err.reason,
+  });
+}
 ```
 
 ### Unwrapping Results Safely
