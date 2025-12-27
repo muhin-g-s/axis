@@ -1,4 +1,4 @@
-import { createId, createIdSchema } from '@backend/libs/id';
+import { createId, createIdSchema, fromStringFactory } from '@backend/libs/id';
 
 const brand = 'UserId';
 
@@ -11,3 +11,5 @@ export type UserId = typeof UserIdSchema.infer;
 export function createUserId(): UserId {
   return createId<Brand>();
 }
+
+export const userIdFromString = fromStringFactory(UserIdSchema);

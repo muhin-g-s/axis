@@ -6,8 +6,8 @@ import { createPriorityName } from "@backend/modules/workspace-configuration/dom
 import { createPriorityLevel } from "@backend/modules/workspace-configuration/domain/value-objects/priority-level";
 import { InvalidPriorityNameErrorToTRPC, InvalidPriorityLevelErrorToTRPC, mapErr } from "./error";
 import type { AuthContext } from "@backend/app/server/init";
-import { userIdFromString } from "@backend/modules/workspaces/domain/value-objects/user-id";
-import { workspaceIdFromString } from "@backend/modules/workspaces/domain/value-objects/workspace-id";
+import { userIdFromString } from "@backend/modules/workspace-configuration/domain/value-objects/user-id";
+import { workspaceIdFromString } from "@backend/modules/workspace-configuration/domain/value-objects/workspace-id";
 
 export const inputCreatePrioritySchema = type({
   name: 'string',

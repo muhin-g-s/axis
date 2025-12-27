@@ -4,8 +4,8 @@ import { Result } from "@backend/libs/result";
 import type { GetPrioritiesByWorkspaceHandler } from "@backend/modules/workspace-configuration/application/handlers/get-priorities-by-workspace";
 import { mapErr } from "./error";
 import type { AuthContext } from "@backend/app/server/init";
-import { userIdFromString } from "@backend/modules/workspaces/domain/value-objects/user-id";
-import { workspaceIdFromString } from "@backend/modules/workspaces/domain/value-objects/workspace-id";
+import { userIdFromString } from "@backend/modules/workspace-configuration/domain/value-objects/user-id";
+import { workspaceIdFromString } from "@backend/modules/workspace-configuration/domain/value-objects/workspace-id";
 
 export const inputGetPrioritiesByWorkspaceSchema = type({
   workspaceId: 'string',
