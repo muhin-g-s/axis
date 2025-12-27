@@ -25,3 +25,18 @@ export interface CreateStatusCommand {
 	readonly order: StatusOrder,
 	readonly workspaceId: WorkspaceId,
 }
+
+export interface GetLabelsByWorkspaceQuery {
+	readonly actorUserId: UserId,
+	readonly workspaceId: WorkspaceId,
+}
+
+export interface GetPrioritiesByWorkspaceQuery {
+	readonly actorUserId: UserId,
+	readonly workspaceId: WorkspaceId,
+}
+
+export interface GetStatusesByWorkspaceQuery {
+	readonly actorUserId: UserId,
+	readonly workspaceId: WorkspaceId,
+}

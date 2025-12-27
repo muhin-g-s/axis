@@ -1,4 +1,4 @@
-import { createId, createIdSchema } from "@backend/libs/id";
+import { createId, createIdSchema, fromStringFactory } from "@backend/libs/id";
 
 const brand = 'PriorityId';
 type Brand = typeof brand;
@@ -9,3 +9,5 @@ export type PriorityId = typeof PriorityIdSchema.infer;
 export function createPriorityId(): PriorityId {
 	return createId<Brand>();
 }
+
+export const priorityIdFromString = fromStringFactory(PriorityIdSchema);

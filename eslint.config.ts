@@ -19,6 +19,10 @@ export default tseslint.config(
       },
     },
     rules: {
+			'@typescript-eslint/restrict-template-expressions': [
+				'error',
+				{ allowNumber: true, allowBoolean: true },
+			],
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
