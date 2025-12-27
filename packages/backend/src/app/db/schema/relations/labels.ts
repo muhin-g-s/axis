@@ -1,12 +1,12 @@
 import { relations } from "drizzle-orm";
-import { labels } from "../tables/labels";
-import { projects } from "../tables/projects";
+import { workspaceLabels } from "../tables/workspace-labels";
+import { workspaces } from "../tables/workspaces";
 import { issueLabels } from "../tables/issue-labels";
 
-export const labelsRelations = relations(labels, ({ one, many }) => ({
-  project: one(projects, {
-    fields: [labels.projectId],
-    references: [projects.id],
+export const workspaceLabelsRelations = relations(workspaceLabels, ({ one, many }) => ({
+  workspace: one(workspaces, {
+    fields: [workspaceLabels.workspaceId],
+    references: [workspaces.id],
   }),
   issues: many(issueLabels),
 }));
