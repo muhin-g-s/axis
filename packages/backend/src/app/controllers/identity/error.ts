@@ -1,5 +1,11 @@
 import { isNotDomainSpecificError } from "@backend/libs/error";
-import { notDomainErrorToTRPC } from "@backend/libs/trpc";
+import {
+  notDomainErrorToTRPC,
+  createBadRequestError,
+  createNotFoundError,
+  createConflictError,
+  createUnauthorizedError
+} from "@backend/libs/trpc";
 import {
 	isInvalidCredentialsError,
 	isInvalidEmailError,
@@ -17,7 +23,7 @@ import {
 	type UserHasBeenDeletedError,
 	type UserNotFoundError,
 } from "@backend/modules/identity/domain/errors";
-import { TRPCError } from "@trpc/server";
+import type { TRPCError } from "@trpc/server";
 import { match } from "ts-pattern";
 
 export function mapErr(err: IdentityDomainError): TRPCError {
@@ -34,64 +40,37 @@ export function mapErr(err: IdentityDomainError): TRPCError {
 }
 
 export function InvalidEmailErrorToTRPC(err: InvalidEmailError): TRPCError {
-	return new TRPCError({
-		code: 'BAD_REQUEST',
-		message: err.message,
-		cause: err.reason,
-	});
+	return createBadRequestError(err);
 }
 
 export function InvalidPasswordErrorToTRPC(err: InvalidPasswordError): TRPCError {
-	return new TRPCError({
-		code: 'BAD_REQUEST',
-		message: err.message,
-		cause: err.reason,
-	});
+	return createBadRequestError(err);
 }
 
 function UserNotFoundErrorToTRPC(err: UserNotFoundError): TRPCError {
-	return new TRPCError({
-		code: 'NOT_FOUND',
-		message: err.message,
-		cause: err.email,
-	});
+	return createNotFoundError(err, err.email);
 }
 
 function InvalidCredentialsErrorToTRPC(
 	err: InvalidCredentialsError,
 ): TRPCError {
-	return new TRPCError({
-		code: 'UNAUTHORIZED',
-		message: err.message,
-	});
+	return createUnauthorizedError(err);
 }
 
 function UserAlreadyExistsErrorToTRPC(
 	err: UserAlreadyExistsError,
 ): TRPCError {
-	return new TRPCError({
-		code: 'CONFLICT',
-		message: err.message,
-		cause: err.identifier,
-	});
+	return createConflictError(err, err.identifier);
 }
 
 export function InvalidUsernameErrorToTRPC(
 	err: InvalidUsernameError,
 ): TRPCError {
-	return new TRPCError({
-		code: 'BAD_REQUEST',
-		message: err.message,
-		cause: err.reason,
-	});
+	return createBadRequestError(err);
 }
 
 function UserHasBeenDeletedErrorToTRPC(
 	err: UserHasBeenDeletedError,
 ): TRPCError {
-	return new TRPCError({
-		code: 'CONFLICT',
-		message: err.message,
-		cause: err.email,
-	});
+	return createConflictError(err, err.email);
 }

@@ -31,6 +31,50 @@ export function createUnexpectedErr(msg: string, cause?: unknown): TRPCError {
 	});
 }
 
+export function createTRPCError(code: TRPCError['code'], err: { message: string, reason?: unknown }, causeField?: unknown): TRPCError {
+	return new TRPCError({
+		code,
+		message: err.message,
+		cause: causeField ?? err.reason
+	});
+}
+
+export function createBadRequestError(err: { message: string, reason?: unknown }): TRPCError {
+	return createTRPCError('BAD_REQUEST', err);
+}
+
+export function createNotFoundError(err: { message: string }, causeField?: unknown): TRPCError {
+	return new TRPCError({
+		code: 'NOT_FOUND',
+		message: err.message,
+		cause: causeField
+	});
+}
+
+export function createConflictError(err: { message: string }, causeField?: unknown): TRPCError {
+	return new TRPCError({
+		code: 'CONFLICT',
+		message: err.message,
+		cause: causeField
+	});
+}
+
+export function createForbiddenError(err: { message: string }, causeField?: unknown): TRPCError {
+	return new TRPCError({
+		code: 'FORBIDDEN',
+		message: err.message,
+		cause: causeField
+	});
+}
+
+export function createUnauthorizedError(err: { message: string }, causeField?: unknown): TRPCError {
+	return new TRPCError({
+		code: 'UNAUTHORIZED',
+		message: err.message,
+		cause: causeField
+	});
+}
+
 export function notDomainErrorToTRPC(err: NotDomainSpecificError): TRPCError {
 	return match(err)
 		.when(isInvalidObjectInDatabaseError, InvalidObjectInDatabaseErrorToTRPC)

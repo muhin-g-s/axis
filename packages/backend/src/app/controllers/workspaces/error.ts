@@ -1,5 +1,11 @@
 import { isNotDomainSpecificError } from "@backend/libs/error";
-import { notDomainErrorToTRPC } from "@backend/libs/trpc";
+import {
+  notDomainErrorToTRPC,
+  createBadRequestError,
+  createNotFoundError,
+  createConflictError,
+  createForbiddenError
+} from "@backend/libs/trpc";
 import {
   isWorkspaceNotFoundError,
   isInvalidWorkspaceNameError,
@@ -19,7 +25,7 @@ import {
   type WorkspaceUserNotFoundError,
   type NotPermissionToAddNewUseError,
 } from "@backend/modules/workspaces/domain/errors";
-import { TRPCError } from "@trpc/server";
+import type { TRPCError } from "@trpc/server";
 import { match } from "ts-pattern";
 
 export function mapErr(err: WorkspaceDomainError): TRPCError {
@@ -37,75 +43,43 @@ export function mapErr(err: WorkspaceDomainError): TRPCError {
 }
 
 export function InvalidWorkspaceNameErrorToTRPC(err: InvalidWorkspaceNameError): TRPCError {
-  return new TRPCError({
-    code: 'BAD_REQUEST',
-    message: err.message,
-    cause: err.reason,
-  });
+  return createBadRequestError(err);
 }
 
 export function InvalidWorkspaceRoleErrorToTRPC(err: InvalidWorkspaceRoleError): TRPCError {
-  return new TRPCError({
-    code: 'BAD_REQUEST',
-    message: err.message,
-    cause: err.reason,
-  });
+  return createBadRequestError(err);
 }
 
 function WorkspaceUserAlreadyExistsErrorToTRPC(
   err: WorkspaceUserAlreadyExistsError,
 ): TRPCError {
-  return new TRPCError({
-    code: 'CONFLICT',
-    message: err.message,
-    cause: { userId: err.userId, workspaceId: err.workspaceId },
-  });
+  return createConflictError(err, { userId: err.userId, workspaceId: err.workspaceId });
 }
 
 function WorkspaceNotFoundErrorToTRPC(err: WorkspaceNotFoundError): TRPCError {
-  return new TRPCError({
-    code: 'NOT_FOUND',
-    message: err.message,
-    cause: { workspaceId: err.workspaceId },
-  });
+  return createNotFoundError(err, { workspaceId: err.workspaceId });
 }
 
 function CannotModifyDeletedWorkspaceErrorToTRPC(
   err: CannotModifyDeletedWorkspaceError,
 ): TRPCError {
-  return new TRPCError({
-    code: 'CONFLICT',
-    message: err.message,
-    cause: { workspaceId: err.workspaceId },
-  });
+  return createConflictError(err, { workspaceId: err.workspaceId });
 }
 
 export function InvalidRoleErrorToTRPC(
   err: InvalidRoleError,
 ): TRPCError {
-  return new TRPCError({
-    code: 'BAD_REQUEST',
-    message: err.message,
-    cause: err.reason,
-  });
+  return createBadRequestError(err);
 }
 
 function WorkspaceUserNotFoundErrorToTRPC(
   err: WorkspaceUserNotFoundError,
 ): TRPCError {
-  return new TRPCError({
-    code: 'NOT_FOUND',
-    message: err.message,
-    cause: { userId: err.userId, workspaceId: err.workspaceId },
-  });
+  return createNotFoundError(err, { userId: err.userId, workspaceId: err.workspaceId });
 }
 
 function NotPermissionToAddNewUseErrorToTRPC(
   err: NotPermissionToAddNewUseError,
 ): TRPCError {
-  return new TRPCError({
-    code: 'FORBIDDEN',
-    message: err.message,
-    cause: { userId: err.userId, workspaceId: err.workspaceId },
-  });
+  return createForbiddenError(err, { userId: err.userId, workspaceId: err.workspaceId });
 }
