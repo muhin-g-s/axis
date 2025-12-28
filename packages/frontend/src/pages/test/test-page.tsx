@@ -1,5 +1,10 @@
+import { Button, HStack } from "@chakra-ui/react";
+
 export default function TestPage() {
   return (
-    <h1>Test1 Page</h1>
+    <HStack>
+      <Button>Click me</Button>
+      <Button>Click me</Button>
+    </HStack>
   )
 }

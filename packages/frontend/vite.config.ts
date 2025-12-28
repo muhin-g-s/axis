@@ -7,9 +7,10 @@ export default defineConfig({
   plugins: [preact()],
   resolve: {
 		alias: {
-		'@': path.resolve('src/'),
-   		 react: "preact/compat",
- 		"react-dom": "preact/compat",
+			'@': path.resolve('src/'),
+			react: "preact/compat",
+			"react-dom": "preact/compat",
+			"react/jsx-runtime": "preact/jsx-runtime"
 		},
 	},
 })
