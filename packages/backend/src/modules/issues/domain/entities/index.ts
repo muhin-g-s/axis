@@ -112,3 +112,11 @@ export function isDeleted(issue: Issue): boolean {
 export function addLabelToIssue(issue: Issue, labelId: LabelId, now: Timestamp): Issue {
 	return { ...issue, label: labelId, updatedAt: now };
 }
+
+export function updateIssueDescription(issue: Issue, description: IssueDescription, now: Timestamp): Issue {
+	return { ...issue, description, updatedAt: now };
+}
+
+export function updateIssueTitle(issue: Issue, title: IssueTitle, now: Timestamp): Issue {
+	return { ...issue, title, updatedAt: now };
+}

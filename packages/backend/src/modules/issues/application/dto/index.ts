@@ -45,3 +45,36 @@ export interface GetProjectIssuesQuery {
 	readonly priorityId?: PriorityId,
 	readonly labelIds?: LabelId[]
 }
+
+export interface GetIssueQuery {
+  readonly actorUserId: UserId;
+  readonly workspaceId: WorkspaceId;
+  readonly issueId: IssueId;
+}
+
+export interface DeleteIssueCommand {
+  readonly actorUserId: UserId,
+  readonly workspaceId: WorkspaceId,
+  readonly issueId: IssueId,
+}
+
+export interface AssignIssueToUserCommand {
+  readonly actorUserId: UserId,
+  readonly workspaceId: WorkspaceId,
+  readonly issueId: IssueId,
+  readonly assigneeId: UserId,
+}
+
+export interface UpdateIssueCommand {
+  readonly actorUserId: UserId,
+  readonly workspaceId: WorkspaceId,
+  readonly issueId: IssueId,
+  readonly title: IssueTitle | null,
+  readonly description: IssueDescription | null,
+}
+
+export interface GetLastAddedIssueQuery {
+  readonly actorUserId: UserId;
+  readonly workspaceId: WorkspaceId;
+  readonly projectId: ProjectId;
+}
