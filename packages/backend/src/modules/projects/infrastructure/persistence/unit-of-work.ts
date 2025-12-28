@@ -3,7 +3,7 @@ import type { UnitOfWork } from '../../domain/repositories/unit-of-work';
 import type { ProjectWriteRepository } from '../../domain/repositories/write';
 import { DrizzleProjectWriteRepository } from './write';
 
-export class DrizzleUnitOfWork implements UnitOfWork {
+export class DrizzleProjectUnitOfWork implements UnitOfWork {
   projects!: ProjectWriteRepository;
 
   constructor(
