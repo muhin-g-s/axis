@@ -6,6 +6,7 @@ export function RouterComponent() {
 		<Router>
 			<Switch>
 				<LayoutRoute path={RouteNames.REGISTRATION} />
+				<LayoutRoute path={RouteNames.LOGIN} />
 			</Switch>
 		</Router>
 	)
