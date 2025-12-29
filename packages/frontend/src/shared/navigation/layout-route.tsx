@@ -7,17 +7,15 @@ import { type ComponentType } from 'preact';
 
 interface LayoutRouteProps {
   path: RouteNames;
-  Preloader: ComponentType;
+  Preloader?: ComponentType;
 }
 
 export function LayoutRoute({ path, Preloader }: LayoutRouteProps) {
   const Component = lazyRoutesMap[path];
   const LayoutComponent = routeLayoutMap[path] ?? defaultLayout;
 
-	const x: number = "hello"; // должно вызвать ошибку
-
   const PageContent = () => (
-    <Suspense fallback={<Preloader />}>
+    <Suspense fallback={ Preloader ? <Preloader /> : <BasePreloader />}>
       <Component />
     </Suspense>
   );

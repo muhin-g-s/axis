@@ -1,26 +1,25 @@
-import { Switch as ChakraSwitch } from "@chakra-ui/react"
-import * as React from "react"
+import { forwardRef, type JSX } from 'preact/compat';
+import { Switch as ChakraSwitch } from "@chakra-ui/react";
 
 export interface SwitchProps extends ChakraSwitch.RootProps {
-  inputProps?: React.InputHTMLAttributes<HTMLInputElement>
-  rootRef?: React.RefObject<HTMLLabelElement | null>
-  trackLabel?: { on: React.ReactNode; off: React.ReactNode }
-  thumbLabel?: { on: React.ReactNode; off: React.ReactNode }
+	rootRef?: preact.Ref<HTMLLabelElement | null>;
+  inputProps?: JSX.IntrinsicElements['input']
+  trackLabel?: { on: preact.ComponentChild; off: preact.ComponentChild };
+  thumbLabel?: { on: preact.ComponentChild; off: preact.ComponentChild };
 }
 
-export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
+export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
   function Switch(props, ref) {
-    const { inputProps, children, rootRef, trackLabel, thumbLabel, ...rest } =
-      props
+    const { inputProps, children, rootRef, trackLabel, thumbLabel, ...rest } = props;
 
     return (
-      <ChakraSwitch.Root ref={rootRef} {...rest}>
-        <ChakraSwitch.HiddenInput ref={ref} {...inputProps} />
+      <ChakraSwitch.Root ref={rootRef as never} {...rest}>
+        <ChakraSwitch.HiddenInput ref={ref as never} {...inputProps} />
         <ChakraSwitch.Control>
           <ChakraSwitch.Thumb>
             {thumbLabel && (
-              <ChakraSwitch.ThumbIndicator fallback={thumbLabel?.off}>
-                {thumbLabel?.on}
+              <ChakraSwitch.ThumbIndicator fallback={thumbLabel.off}>
+                {thumbLabel.on}
               </ChakraSwitch.ThumbIndicator>
             )}
           </ChakraSwitch.Thumb>
@@ -30,10 +29,8 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
             </ChakraSwitch.Indicator>
           )}
         </ChakraSwitch.Control>
-        {children != null && (
-          <ChakraSwitch.Label>{children}</ChakraSwitch.Label>
-        )}
+        {children != null && <ChakraSwitch.Label>{children}</ChakraSwitch.Label>}
       </ChakraSwitch.Root>
-    )
-  },
-)
+    );
+  }
+);

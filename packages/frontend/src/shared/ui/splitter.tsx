@@ -32,5 +32,6 @@ export const SplitterResizeTrigger = React.forwardRef<
 
 export const SplitterRoot = ChakraSplitter.Root
 export const SplitterRootProvider = ChakraSplitter.RootProvider
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const SplitterPropsProvider = ChakraSplitter.PropsProvider
-export const SplitterContext = ChakraSplitter.Context
+export const SplitterContext: typeof ChakraSplitter.Context = ChakraSplitter.Context

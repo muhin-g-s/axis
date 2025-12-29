@@ -66,13 +66,14 @@ export const TagsInputRoot = React.forwardRef<
   return <ChakraTagsInput.Root {...props} ref={ref} />
 }) as ChakraTagsInput.RootProps
 
-export const TagsInputItemText = ChakraTagsInput.ItemText
-export const TagsInputItemPreview = ChakraTagsInput.ItemPreview
-export const TagsInputItemInput = ChakraTagsInput.ItemInput
-export const TagsInputItemContext = ChakraTagsInput.ItemContext
-export const TagsInputRootProvider = ChakraTagsInput.RootProvider
-export const TagsInputPropsProvider = ChakraTagsInput.PropsProvider
-export const TagsInputLabel = ChakraTagsInput.Label
-export const TagsInputInput = ChakraTagsInput.Input
-export const TagsInputContext = ChakraTagsInput.Context
-export const TagsInputHiddenInput = ChakraTagsInput.HiddenInput
+export const TagsInputItemText: typeof ChakraTagsInput.ItemText = ChakraTagsInput.ItemText
+export const TagsInputItemPreview: typeof ChakraTagsInput.ItemPreview = ChakraTagsInput.ItemPreview
+export const TagsInputItemInput: typeof ChakraTagsInput.ItemInput = ChakraTagsInput.ItemInput
+export const TagsInputItemContext: typeof ChakraTagsInput.ItemContext = ChakraTagsInput.ItemContext
+export const TagsInputRootProvider: typeof ChakraTagsInput.RootProvider = ChakraTagsInput.RootProvider
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+export const TagsInputPropsProvider: typeof ChakraTagsInput.PropsProvider = ChakraTagsInput.PropsProvider
+export const TagsInputLabel: typeof ChakraTagsInput.Label = ChakraTagsInput.Label
+export const TagsInputInput: typeof ChakraTagsInput.Input = ChakraTagsInput.Input
+export const TagsInputContext: typeof ChakraTagsInput.Context = ChakraTagsInput.Context
+export const TagsInputHiddenInput: typeof ChakraTagsInput.HiddenInput = ChakraTagsInput.HiddenInput

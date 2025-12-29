@@ -1,5 +1,5 @@
 import { render } from 'preact'
-import { App } from './app.tsx'
+import { App } from './app'
 import '../app.css'
 
 const app = document.getElementById('app')

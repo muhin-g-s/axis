@@ -15,7 +15,7 @@ export const StatLabel = React.forwardRef<HTMLDivElement, StatLabelProps>(
   function StatLabel(props, ref) {
     const { info, children, ...rest } = props
     return (
-      <ChakraStat.Label {...rest} ref={ref}>
+      <ChakraStat.Label {...rest} ref={ref as never}>
         {children}
         {info && <InfoTip>{info}</InfoTip>}
       </ChakraStat.Label>
@@ -34,8 +34,8 @@ export const StatValueText = React.forwardRef<
 >(function StatValueText(props, ref) {
   const { value, formatOptions, children, ...rest } = props
   return (
-    <ChakraStat.ValueText {...rest} ref={ref}>
-      {children ||
+    <ChakraStat.ValueText {...rest} ref={ref as never}>
+      {children ??
         (value != null && <FormatNumber value={value} {...formatOptions} />)}
     </ChakraStat.ValueText>
   )
@@ -44,7 +44,7 @@ export const StatValueText = React.forwardRef<
 export const StatUpTrend = React.forwardRef<HTMLDivElement, BadgeProps>(
   function StatUpTrend(props, ref) {
     return (
-      <Badge colorPalette="green" gap="0" {...props} ref={ref}>
+      <Badge colorPalette="green" gap="0" {...props} ref={ref as never}>
         <ChakraStat.UpIndicator />
         {props.children}
       </Badge>
@@ -55,7 +55,7 @@ export const StatUpTrend = React.forwardRef<HTMLDivElement, BadgeProps>(
 export const StatDownTrend = React.forwardRef<HTMLDivElement, BadgeProps>(
   function StatDownTrend(props, ref) {
     return (
-      <Badge colorPalette="red" gap="0" {...props} ref={ref}>
+      <Badge colorPalette="red" gap="0" {...props} ref={ref as never}>
         <ChakraStat.DownIndicator />
         {props.children}
       </Badge>

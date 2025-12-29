@@ -1,18 +1,19 @@
-import type { BoxProps, InputElementProps } from "@chakra-ui/react"
-import { Group, InputElement } from "@chakra-ui/react"
-import * as React from "react"
+import { cloneElement, forwardRef } from 'preact/compat';
+import type { BoxProps, InputElementProps } from "@chakra-ui/react";
+import { Group, InputElement } from "@chakra-ui/react";
+import type { ComponentChild } from 'preact';
 
 export interface InputGroupProps extends BoxProps {
-  startElementProps?: InputElementProps
-  endElementProps?: InputElementProps
-  startElement?: React.ReactNode
-  endElement?: React.ReactNode
-  children: React.ReactElement<InputElementProps>
-  startOffset?: InputElementProps["paddingStart"]
-  endOffset?: InputElementProps["paddingEnd"]
+  startElementProps?: InputElementProps;
+  endElementProps?: InputElementProps;
+  startElement?: ComponentChild;
+  endElement?: ComponentChild;
+  children: preact.JSX.Element & InputElementProps;
+  startOffset?: InputElementProps["paddingStart"];
+  endOffset?: InputElementProps["paddingEnd"];
 }
 
-export const InputGroup = React.forwardRef<HTMLDivElement, InputGroupProps>(
+export const InputGroup = forwardRef<HTMLDivElement, InputGroupProps>(
   function InputGroup(props, ref) {
     const {
       startElement,
@@ -23,31 +24,32 @@ export const InputGroup = React.forwardRef<HTMLDivElement, InputGroupProps>(
       startOffset = "6px",
       endOffset = "6px",
       ...rest
-    } = props
+    } = props;
 
-    const child =
-      React.Children.only<React.ReactElement<InputElementProps>>(children)
+    const child = children;
 
     return (
-      <Group ref={ref} {...rest}>
+      <Group ref={ref as never} {...rest}>
         {startElement && (
           <InputElement pointerEvents="none" {...startElementProps}>
             {startElement}
           </InputElement>
         )}
-        {React.cloneElement(child, {
-          ...(startElement && {
-            ps: `calc(var(--input-height) - ${startOffset})`,
-          }),
-          ...(endElement && { pe: `calc(var(--input-height) - ${endOffset})` }),
-          ...children.props,
+
+        {cloneElement(child, {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string, @typescript-eslint/restrict-template-expressions
+          ...(startElement && { ps: `calc(var(--input-height) - ${startOffset})` }),
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string, @typescript-eslint/restrict-template-expressions
+					...(endElement && { pe: `calc(var(--input-height) - ${endOffset})` }),
+          ...child.props,
         })}
+
         {endElement && (
           <InputElement placement="end" {...endElementProps}>
             {endElement}
           </InputElement>
         )}
       </Group>
-    )
-  },
-)
+    );
+  }
+);
