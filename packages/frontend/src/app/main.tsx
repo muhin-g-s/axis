@@ -7,7 +7,7 @@ const app = document.getElementById('app')
 if(!app) throw new Error('No app found')
 
 render(
-			<Provider>
-				<App />
-			</Provider>
+	<Provider>
+		<App />
+	</Provider>
 , app)

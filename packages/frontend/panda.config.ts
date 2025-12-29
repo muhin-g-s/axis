@@ -16,5 +16,8 @@ export default defineConfig({
   },
 
   // The output directory for your css system
-  outdir: "styled-system",
+  outdir: "./src/shared/ui/styled-system",
+
+  // Enable jsxs for styled components
+  jsxFramework: "react",
 });

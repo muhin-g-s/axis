@@ -14,6 +14,9 @@ export function App() {
 							<PrefetchLink routeName={RouteNames.TEST}>
 								<button>Test</button>
 							</PrefetchLink>
+							<PrefetchLink routeName={RouteNames.REGISTRATION}>
+								<button>Register</button>
+							</PrefetchLink>
 						</nav>
 					</header>
 
@@ -22,6 +25,7 @@ export function App() {
 							<AsyncRoute path={RouteNames.HOME} />
 							<AsyncRoute path={RouteNames.TEST} />
 							<AsyncRoute path={RouteNames.TODO_DETAIL} />
+							<AsyncRoute path={RouteNames.REGISTRATION} />
 						</Switch>
 					</main>
 				</div>

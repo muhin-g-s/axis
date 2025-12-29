@@ -1,10 +1,7 @@
-import { TodoList } from '@/modules/todo';
+import { css } from '@/shared/ui/styled-system/css'
 
 export default function HomePage() {
   return (
-    <div>
-      <h1>Todo List App</h1>
-      <TodoList />
-    </div>
+    <div class={css({ fontSize: '2xl', fontWeight: 'bold', pt: '56px' })}>Hello 🐼!</div>
   )
 }

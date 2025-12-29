@@ -3,7 +3,14 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/*.js', '**/*.mjs', '**/coverage/**', '**/generated/**'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/*.js',
+      '**/*.mjs',
+      '**/coverage/**',
+      '**/generated/**',
+    ],
   },
 
   eslint.configs.recommended,
@@ -19,10 +26,10 @@ export default tseslint.config(
       },
     },
     rules: {
-			'@typescript-eslint/restrict-template-expressions': [
-				'error',
-				{ allowNumber: true, allowBoolean: true },
-			],
+      '@typescript-eslint/restrict-template-expressions': [
+        'error',
+        { allowNumber: true, allowBoolean: true },
+      ],
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-explicit-any': 'error',
@@ -52,5 +59,19 @@ export default tseslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
     },
+  },
+
+  {
+    files: ['**/*.tsx'],
+    rules: {
+      '@typescript-eslint/explicit-function-return-type': 'off',
+			"@typescript-eslint/explicit-module-boundary-types": "off"
+    },
+  },
+	{
+		files: ['**/*.tsx'],
+		rules: {
+			'@typescript-eslint/strict-boolean-expressions': 'off',
+		},
   },
 );

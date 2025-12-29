@@ -34,3 +34,7 @@ pnpm-debug.log*
 # Temporary files
 tmp/
 temp/
+
+## Panda
+styled-system
+styled-system-studio
