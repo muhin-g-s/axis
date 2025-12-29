@@ -1,9 +1,17 @@
 import { css } from '@/shared/ui/styled-system/css'
 import { Box } from "@chakra-ui/react";
 
-interface UsernameFieldProps {
+interface TextFieldProps {
+  id: string;
+  name: string;
+  label: string;
+  placeholder: string;
+  type?: string;
   error?: string;
   isInvalid?: boolean;
+  required?: boolean;
+  minLength?: number;
+  className?: string;
 }
 
 const inputStyle = css({
@@ -25,26 +33,35 @@ const inputStyle = css({
   }
 });
 
-export const UsernameField: React.FC<UsernameFieldProps> = ({
+export const TextField = ({
+  id,
+  name,
+  label,
+  placeholder,
+  type = "text",
   error,
-  isInvalid = false
-}) => {
+  isInvalid = false,
+  required = false,
+  minLength,
+  className
+}: TextFieldProps) => {
   return (
-    <Box w="full">
+    <Box w="full" className={className}>
       <Box
         fontSize="sm"
         fontWeight="medium"
         color="gray.700"
         mb="2"
       >
-        Username
+        {label}
       </Box>
       <input
-        id="username"
-        name="username"
-        type="text"
-        placeholder="Enter your username"
-        required
+        id={id}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        required={required}
+        minLength={minLength}
         className={inputStyle}
         data-invalid={isInvalid}
       />

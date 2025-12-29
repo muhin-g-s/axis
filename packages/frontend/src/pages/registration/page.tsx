@@ -1,4 +1,4 @@
-import { RegistrationForm } from '@/modules/registration'
+import { RegistrationForm } from '@/modules/identity'
 import { css } from '@/shared/ui/styled-system/css'
 import { Box, Heading } from '@chakra-ui/react'
 
@@ -19,7 +19,6 @@ const cardStyle = css({
   zIndex: 1,
   transition: 'all 0.2s ease',
   _hover: {
-    transform: 'translateY(-5px)',
     shadow: '2xl',
   },
 })

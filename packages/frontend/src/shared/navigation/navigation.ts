@@ -8,7 +8,7 @@ export const RouteNames = {
 export type RouteNames = (typeof RouteNames)[keyof typeof RouteNames];
 
 export const dynamicRoutesMap = {
-  [RouteNames.REGISTRATION]: (): Promise<{ default: FunctionComponent }> => import('@/pages/registration/registration-page'),
+  [RouteNames.REGISTRATION]: (): Promise<{ default: FunctionComponent }> => import('@/pages/registration/page'),
 } satisfies Record<RouteNames, () => Promise<{ default: FunctionComponent }>>;
 
 export const lazyRoutesMap = {
