@@ -1,4 +1,5 @@
 import type { ComponentChildren } from 'preact';
+import { DiProvider } from '@/infrastructure/di/context.di';
 
 interface ProvidersProps {
   children: ComponentChildren;
@@ -6,6 +7,8 @@ interface ProvidersProps {
 
 export function Providers({ children }: ProvidersProps) {
   return (
-    {children}
+    <DiProvider>
+      {children}
+    </DiProvider>
   );
 }
