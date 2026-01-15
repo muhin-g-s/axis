@@ -6,7 +6,9 @@ export interface LoginPayload {
 };
 
 export interface LoginResponse {
-  token: string;
+  email: string;
+	username: string;
+	id: string;
 };
 
 export const passwordSchema = type('string>=8');

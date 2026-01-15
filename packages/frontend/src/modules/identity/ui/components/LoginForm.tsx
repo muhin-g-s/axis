@@ -1,25 +1,23 @@
 import { Input } from '@/shared/ui/Input';
 import { Button } from '@/shared/ui/Button';
-import { useIdentityContext } from '../../hooks/identity.context';
 
 import { useForm } from '@tanstack/react-form';
 
 import { getOnChangeValidator, getOnSubmit, getTouchedFieldError } from '@/shared/utils/form';
 import { emailSchema } from '../../model/email.model';
 import { passwordSchema } from '../../model/login.model';
+import { useLogin } from '../../query/login.mutation';
 
 
 export function LoginForm() {
-  const { loginService } = useIdentityContext();
+  const { mutate } = useLogin();
 
   const form = useForm({
     defaultValues: {
       email: '',
       password: '',
     },
-    onSubmit: async ({ value }) => {
-      await loginService.login(value.email, value.password);
-    },
+    onSubmit: ({ value }) => { mutate(value); },
   });
 
   return (

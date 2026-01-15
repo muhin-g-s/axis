@@ -27,6 +27,6 @@ export class LoginService implements ILoginService {
 
   async login(email: string, password: string): Promise<void> {
     const result = await this.loginApi.login({ email, password });
-    this.authSession.setToken(result.token);
+    this.authSession.setToken(result.email);
   }
 }

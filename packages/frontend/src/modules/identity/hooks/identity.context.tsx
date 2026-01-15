@@ -1,6 +1,6 @@
 import { useContext, useRef } from 'preact/hooks';
 import { type ComponentChildren, createContext } from 'preact';
-import { type IHttpClient, LoginApi } from '../api/login.api';
+import { type LoginApi } from '../api/login.api';
 import { type AuthSession, LoginService } from '../services/login.service';
 
 interface IdentityContext {
@@ -10,7 +10,7 @@ interface IdentityContext {
 const IdentityContext = createContext<IdentityContext | null>(null);
 
 interface Dependency {
-	httpClient: IHttpClient;
+	api: LoginApi;
 	authSession: AuthSession;
 }
 
@@ -20,11 +20,11 @@ interface IdentityContextProviderProps {
 }
 
 export function IdentityProvider({ children, dependency }: IdentityContextProviderProps) {
-  const { httpClient, authSession } = dependency;
+  const { api, authSession } = dependency;
 
   const loginServiceRef = useRef<LoginService>(
 		LoginService.getInstance(
-			new LoginApi(httpClient),
+			api,
 			authSession
 		)
 	);
