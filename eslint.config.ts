@@ -65,13 +65,13 @@ export default tseslint.config(
     files: ['**/*.tsx'],
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
-			"@typescript-eslint/explicit-module-boundary-types": "off"
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
     },
   },
-	{
-		files: ['**/*.tsx'],
-		rules: {
-			'@typescript-eslint/strict-boolean-expressions': 'off',
-		},
+  {
+    files: ['**/*.tsx'],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': 'off',
+    },
   },
 );
