@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+		"build:types": "tsc -b tsconfig.types.json",
     "build": "tsdown",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.mjs",
@@ -12,6 +13,11 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx src/db/seed.ts"
+  },
+	"exports": {
+    ".": {
+      "types": "./dist-types/index.d.ts"
+    }
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",

@@ -1,5 +1,5 @@
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
-import type { AppRouter } from '../../../../backend/src';
+import type { AppRouter } from '@backend';
 import { getConfig } from '../config';
 
 const conf = getConfig();

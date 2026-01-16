@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+
+    "rootDir": "./src",
+    "outDir": "./dist-types",
+
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+
+    "strict": true,
+    "skipLibCheck": true,
+
+		"paths": {
+      "@backend/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}

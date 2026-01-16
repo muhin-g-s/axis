@@ -10,15 +10,20 @@
     "composite": true,
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "types": ["vite/client"],
-    "verbatimModuleSyntax": false,
+    "verbatimModuleSyntax": true,
 		"paths": {
       "react": ["./node_modules/preact/compat/"],
       "react-dom": ["./node_modules/preact/compat/"],
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+			"@backend": ["../backend/dist-types"],
+      "@backend/*": ["../backend/dist-types/*"],
     },
 		"jsx": "react-jsx",
     "jsxImportSource": "preact",
   },
+	 "references": [
+    { "path": "../backend" }
+  ],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
 }

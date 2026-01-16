@@ -15,7 +15,7 @@ export function createServer(container: Container): void {
 		basePath,
 	});
 
-	const infraHandler = new InfraRoutes(container);
+	const infraHandler = new InfraRoutes();
 
 	const server = http.createServer(
 		(req, res) => {
